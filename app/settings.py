@@ -54,8 +54,9 @@ MAX_STORY_CHARS = 4000
 MAX_DURATION = 55
 # Captions are always drawn on a 1080x1920 canvas, then scaled to the output size.
 CAP_W, CAP_H = 1080, 1920
-# Output size. Lower it on small servers: REELFORGE_OUT_WIDTH=720 uses far less memory.
-OUT_W = max(360, int(os.environ.get("REELFORGE_OUT_WIDTH", "1080")) // 2 * 2)
+# Output size. 720 (720x1280) is light enough for small servers; set REELFORGE_OUT_WIDTH=1080
+# on a bigger machine for full HD.
+OUT_W = max(360, int(os.environ.get("REELFORGE_OUT_WIDTH", "720")) // 2 * 2)
 OUT_H = OUT_W * 16 // 9 // 2 * 2
 OUT_FPS = int(os.environ.get("REELFORGE_FPS", "30"))
 
