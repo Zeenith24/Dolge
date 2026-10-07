@@ -1,9 +1,9 @@
-"""SQLAlchemy models and session handling (SQLite)."""
+"""SQLAlchemy models, session handling and the tiny startup migration."""
 import datetime as dt
 import uuid
 
 from sqlalchemy import (Boolean, DateTime, Float, ForeignKey, Integer, String, Text,
-                        create_engine, event)
+                        create_engine, event, inspect, text)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 from . import settings as S
@@ -45,6 +45,22 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(80))
     password_hash: Mapped[str] = mapped_column(String(255))
     credits: Mapped[int] = mapped_column(Integer, default=S.SIGNUP_CREDITS)
+    # accounts that existed before email verification was added count as verified
+    email_verified: Mapped[bool] = mapped_column(Boolean, default=False, server_default="1")
+    # bumped on password reset: invalidates every login cookie issued before it
+    session_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class EmailToken(Base):
+    """One-time tokens for email verification and password reset (only a hash is stored)."""
+    __tablename__ = "email_tokens"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    kind: Mapped[str] = mapped_column(String(16))              # verify | reset
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    expires_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=now)
 
 
@@ -71,6 +87,7 @@ class Video(Base):
     pitch: Mapped[int] = mapped_column(Integer, default=0)
     music: Mapped[str | None] = mapped_column(String(255), nullable=True)
     caption_style: Mapped[str] = mapped_column(String(32), default="cut_paper")
+    out_width: Mapped[int] = mapped_column(Integer, default=720, server_default="720")
     clip_ids: Mapped[str] = mapped_column(Text, default="")   # comma separated asset ids, ordered
     status: Mapped[str] = mapped_column(String(16), default="queued")  # queued|processing|done|failed
     stage: Mapped[str] = mapped_column(String(80), default="Queued")
@@ -85,8 +102,27 @@ class Video(Base):
     user: Mapped[User] = relationship()
 
 
+# (table, column, SQL type + default). create_all() never alters existing tables, so columns added
+# after the first deploy are listed here and added on startup if missing.
+_MIGRATIONS = [
+    ("users", "email_verified", "BOOLEAN NOT NULL DEFAULT {TRUE}"),
+    ("users", "session_version", "INTEGER NOT NULL DEFAULT 0"),
+    ("videos", "out_width", "INTEGER NOT NULL DEFAULT 720"),
+]
+
+
+def migrate():
+    insp = inspect(engine)
+    true_lit = "1" if IS_SQLITE else "true"
+    with engine.begin() as conn:
+        for table, column, ddl in _MIGRATIONS:
+            if table in insp.get_table_names() and column not in {c["name"] for c in insp.get_columns(table)}:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl.format(TRUE=true_lit)}"))
+
+
 def init_db():
     Base.metadata.create_all(engine)
+    migrate()
 
 
 def get_db():

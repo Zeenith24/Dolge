@@ -3,6 +3,7 @@ Dolge reel studio - FastAPI backend.
 
 Run:  uvicorn app.main:app --reload      (from the project root)
 """
+import datetime as dt
 import os
 import re
 import secrets
@@ -19,7 +20,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from . import auth, engine, settings as S
+from . import auth, engine, mailer, reddit, settings as S
 from .db import Asset, SessionLocal, User, Video, get_db, init_db, new_id
 
 # One render at a time by default (each uses a few hundred MB); raise on bigger servers.
@@ -90,13 +91,28 @@ def _refund(db: Session, video: Video):
 
 
 def user_out(u: User):
-    return {"id": u.id, "email": u.email, "name": u.name, "credits": u.credits}
+    return {"id": u.id, "email": u.email, "name": u.name, "credits": u.credits,
+            "email_verified": bool(u.email_verified), "verification_required": S.REQUIRE_VERIFIED}
+
+
+def base_url(request: Request) -> str:
+    """Public site address for email links. Set APP_URL in production (prevents Host-header spoofing)."""
+    return S.APP_URL or str(request.base_url).rstrip("/")
+
+
+def client_ip(request: Request) -> str:
+    return request.client.host if request.client else "?"
+
+
+def send_verification_email(db: Session, request: Request, user: User):
+    raw = auth.create_email_token(db, user, "verify", dt.timedelta(hours=S.VERIFY_TTL_HOURS))
+    mailer.send_verification(user.email, user.name, f"{base_url(request)}/verify?token={raw}")
 
 
 def video_out(v: Video):
     return {
         "id": v.id, "title": v.title, "text": v.text, "voice": v.voice, "speed": v.speed,
-        "pitch": v.pitch, "music": v.music, "caption_style": v.caption_style,
+        "pitch": v.pitch, "music": v.music, "caption_style": v.caption_style, "out_width": v.out_width,
         "clip_ids": [c for c in v.clip_ids.split(",") if c], "status": v.status,
         "stage": v.stage, "progress": round(v.progress, 1), "error": v.error,
         "duration": round(v.duration or 0, 1), "has_thumb": bool(v.thumb),
@@ -124,8 +140,8 @@ def own_video(db: Session, user: User, vid: str) -> Video:
     return v
 
 
-def _set_cookie(resp: Response, user_id: str):
-    resp.set_cookie(S.COOKIE_NAME, auth.make_token(user_id), max_age=S.TOKEN_TTL_SECONDS,
+def _set_cookie(resp: Response, user: User):
+    resp.set_cookie(S.COOKIE_NAME, auth.make_token(user), max_age=S.TOKEN_TTL_SECONDS,
                     httponly=True, samesite="lax", secure=S.COOKIE_SECURE, path="/")
 
 
@@ -156,11 +172,29 @@ class VideoIn(BaseModel):
     pitch: int = Field(0, ge=-6, le=6)
     music: str | None = None
     caption_style: str = "cut_paper"
+    quality: int = S.DEFAULT_WIDTH
     clip_ids: list[str] = Field(min_length=1, max_length=8)
 
 
 class ShareIn(BaseModel):
     enabled: bool
+
+
+class TokenIn(BaseModel):
+    token: str = Field(min_length=10, max_length=200)
+
+
+class ForgotIn(BaseModel):
+    email: EmailStr
+
+
+class ResetIn(BaseModel):
+    token: str = Field(min_length=10, max_length=200)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class RedditIn(BaseModel):
+    url: str = Field(min_length=8, max_length=300)
 
 
 # --------------------------------------------------------------------------- pages
@@ -182,6 +216,16 @@ def login_page(request: Request, db: Session = Depends(get_db)):
     return _page("login.html")
 
 
+@app.get("/verify", include_in_schema=False)
+def verify_page():
+    return _page("verify.html")
+
+
+@app.get("/reset", include_in_schema=False)
+def reset_page():
+    return _page("reset.html")
+
+
 @app.get("/share/{token}", include_in_schema=False)
 def share_page(token: str):
     return _page("share.html")
@@ -189,15 +233,19 @@ def share_page(token: str):
 
 # --------------------------------------------------------------------------- auth api
 @app.post("/api/auth/register")
-def register(data: RegisterIn, response: Response, db: Session = Depends(get_db)):
-    user = User(email=data.email.lower(), name=data.name.strip(), password_hash=auth.hash_password(data.password))
+def register(data: RegisterIn, request: Request, response: Response, db: Session = Depends(get_db)):
+    auth.rate_limit(f"register:{client_ip(request)}", 10, 3600, "Too many sign-ups from this network. Try later.")
+    user = User(email=data.email.lower(), name=data.name.strip(), password_hash=auth.hash_password(data.password),
+                email_verified=not S.REQUIRE_VERIFIED)
     db.add(user)
     try:
         db.commit()
     except IntegrityError:
         db.rollback()
         raise HTTPException(409, "An account with that email already exists.")
-    _set_cookie(response, user.id)
+    if S.REQUIRE_VERIFIED:
+        send_verification_email(db, request, user)
+    _set_cookie(response, user)
     return user_out(user)
 
 
@@ -210,7 +258,7 @@ def login(data: LoginIn, request: Request, response: Response, db: Session = Dep
         auth.record_login_failure(key)
         raise HTTPException(401, "Incorrect email or password.")
     auth.clear_login_failures(key)
-    _set_cookie(response, user.id)
+    _set_cookie(response, user)
     return user_out(user)
 
 
@@ -225,6 +273,48 @@ def me(user: User = Depends(auth.current_user)):
     return user_out(user)
 
 
+@app.post("/api/auth/verify-email")
+def verify_email(data: TokenIn, response: Response, db: Session = Depends(get_db)):
+    user = auth.consume_email_token(db, data.token, "verify")
+    user.email_verified = True
+    db.commit()
+    _set_cookie(response, user)          # also signs them in on this device
+    return user_out(user)
+
+
+@app.post("/api/auth/resend-verification")
+def resend_verification(request: Request, user: User = Depends(auth.current_user), db: Session = Depends(get_db)):
+    if user.email_verified or not S.REQUIRE_VERIFIED:
+        return {"ok": True, "already_verified": True}
+    auth.rate_limit(f"resend:{user.id}", 3, 3600, "You can request at most 3 emails per hour.")
+    send_verification_email(db, request, user)
+    return {"ok": True}
+
+
+@app.post("/api/auth/forgot-password")
+def forgot_password(data: ForgotIn, request: Request, db: Session = Depends(get_db)):
+    auth.rate_limit(f"forgot-ip:{client_ip(request)}", 10, 3600, "Too many requests. Try again later.")
+    email = data.email.lower()
+    auth.rate_limit(f"forgot:{email}", 3, 3600, "Too many requests for this email. Try again later.")
+    user = db.scalar(select(User).where(User.email == email))
+    if user and S.MAIL_ENABLED:
+        raw = auth.create_email_token(db, user, "reset", dt.timedelta(minutes=S.RESET_TTL_MINUTES))
+        mailer.send_password_reset(user.email, user.name, f"{base_url(request)}/reset?token={raw}")
+    # same answer whether or not the account exists (no account enumeration)
+    return {"ok": True, "email_enabled": S.MAIL_ENABLED}
+
+
+@app.post("/api/auth/reset-password")
+def reset_password(data: ResetIn, response: Response, db: Session = Depends(get_db)):
+    user = auth.consume_email_token(db, data.token, "reset")
+    user.password_hash = auth.hash_password(data.password)
+    user.session_version = (user.session_version or 0) + 1      # log out every other device
+    user.email_verified = True                                   # they proved they own the inbox
+    db.commit()
+    _set_cookie(response, user)
+    return user_out(user)
+
+
 # --------------------------------------------------------------------------- catalog
 @app.get("/api/config")
 def config(user: User = Depends(auth.current_user)):
@@ -232,6 +322,8 @@ def config(user: User = Depends(auth.current_user)):
         "voices": [{k: v[k] for k in ("id", "name", "emoji", "gender", "tag", "desc")} for v in S.VOICES],
         "captions": S.CAPTION_STYLES,
         "music": list_music(),
+        "qualities": S.QUALITIES,
+        "default_quality": S.DEFAULT_WIDTH,
         "max_duration": S.MAX_DURATION,
         "max_chars": S.MAX_STORY_CHARS,
     }
@@ -352,7 +444,7 @@ def run_job(video_id: str):
         duration, truncated = engine.render_video(
             text=v.text, out_path=out_path, voice_edge=S.VOICE_BY_ID[v.voice]["edge"], speed=v.speed,
             pitch=v.pitch, clip_paths=paths, caption_style=v.caption_style, music_path=music_path,
-            progress=progress, job_id=v.id)
+            progress=progress, job_id=v.id, out_width=v.out_width)
 
         thumb = os.path.join(S.THUMB_DIR, f"v_{v.id}.jpg")
         v.thumb = thumb if engine.make_thumbnail(out_path, thumb, at=min(1.0, duration / 2)) else None
@@ -383,6 +475,10 @@ def create_video(data: VideoIn, user: User = Depends(auth.current_user), db: Ses
         raise HTTPException(400, "Unknown soundtrack.")
     if not engine.clean_text(data.text):
         raise HTTPException(400, "Write a story first.")
+    if S.REQUIRE_VERIFIED and not user.email_verified:
+        raise HTTPException(403, "Please confirm your email address first. Check your inbox (and spam folder).")
+    if data.quality not in S.ALLOWED_WIDTHS:
+        raise HTTPException(400, "That video quality isn't available on this server.")
 
     clip_ids = list(dict.fromkeys(data.clip_ids))
     ok = {a.id for a in db.scalars(select(Asset).where(Asset.id.in_(clip_ids),
@@ -399,7 +495,8 @@ def create_video(data: VideoIn, user: User = Depends(auth.current_user), db: Ses
             raise HTTPException(402, "You're out of credits.")
         video = Video(user_id=user.id, title=data.title.strip() or "Untitled reel", text=data.text,
                       voice=data.voice, speed=data.speed, pitch=data.pitch, music=data.music,
-                      caption_style=data.caption_style, clip_ids=",".join(clip_ids))
+                      caption_style=data.caption_style, out_width=data.quality,
+                      clip_ids=",".join(clip_ids))
         db.add(video)
         db.commit()
     executor.submit(run_job, video.id)
@@ -459,6 +556,16 @@ def share_video(vid: str, data: ShareIn, user: User = Depends(auth.current_user)
     v.share_token = (v.share_token or secrets.token_urlsafe(16)) if data.enabled else None
     db.commit()
     return video_out(v)
+
+
+# --------------------------------------------------------------------------- reddit import
+@app.post("/api/reddit/import")
+def reddit_import(data: RedditIn, user: User = Depends(auth.current_user)):
+    auth.rate_limit(f"reddit:{user.id}", 20, 3600, "You've imported a lot of stories this hour. Try again later.")
+    try:
+        return reddit.import_story(data.url)
+    except reddit.RedditError as exc:
+        raise HTTPException(400, str(exc))
 
 
 # --------------------------------------------------------------------------- public share

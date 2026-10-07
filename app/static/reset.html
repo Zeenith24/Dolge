@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Dolge – New password</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>*, body, p, span, button, a, div, h1, input, label { font-family: 'Courier Prime', monospace !important; }</style>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="/static/tailwind-config.js"></script>
+</head>
+<body class="bg-background text-on-surface parchment-grid min-h-screen flex items-center justify-center p-4">
+<main class="w-full max-w-md bg-[#fffdf0] rounded-xl border-2 border-on-surface tactile-shadow-lg p-6">
+  <h1 class="text-xl font-bold mb-1">Choose a new password</h1>
+  <p class="text-sm text-on-surface-variant mb-4">You'll be signed out of all other devices.</p>
+  <form id="form" class="space-y-3" novalidate>
+    <div><label for="pw" class="text-xs font-bold uppercase block mb-1">New password</label>
+      <input id="pw" type="password" autocomplete="new-password" class="w-full rounded border-2 border-on-surface bg-surface-container-lowest text-sm">
+      <p class="text-[11px] text-on-surface-variant mt-1">At least 8 characters.</p></div>
+    <div><label for="pw2" class="text-xs font-bold uppercase block mb-1">Repeat password</label>
+      <input id="pw2" type="password" autocomplete="new-password" class="w-full rounded border-2 border-on-surface bg-surface-container-lowest text-sm"></div>
+    <p id="error" class="hidden text-xs font-bold text-error bg-error-container border border-error rounded px-2 py-1"></p>
+    <button id="submit" class="w-full bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container py-3 rounded-lg font-bold uppercase tracking-wide tactile-shadow border-2 border-on-surface">Save password</button>
+  </form>
+  <p id="done" class="hidden text-sm text-center"></p>
+</main>
+<script src="/static/common.js"></script>
+<script>
+const token = new URLSearchParams(location.search).get('token') || '';
+history.replaceState(null, '', location.pathname);   // keep the token out of the address bar / history
+const $ = id => document.getElementById(id);
+function showError(m) { $('error').textContent = m; $('error').classList.remove('hidden'); }
+if (!token) showError('This reset link is incomplete. Open the link from your email again.');
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('error').classList.add('hidden');
+  if (!token) return showError('This reset link is incomplete.');
+  if ($('pw').value.length < 8) return showError('Password must be at least 8 characters.');
+  if ($('pw').value !== $('pw2').value) return showError('The two passwords don’t match.');
+  $('submit').disabled = true;
+  try {
+    await api('/api/auth/reset-password', { json: { token, password: $('pw').value } });
+    $('form').classList.add('hidden');
+    $('done').classList.remove('hidden');
+    $('done').innerHTML = '✅ Password changed. Taking you to the studio…';
+    setTimeout(() => location.href = '/', 1500);
+  } catch (ex) { showError(ex.message); $('submit').disabled = false; }
+});
+</script>
+</body></html>

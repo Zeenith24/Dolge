@@ -239,9 +239,9 @@ def _plan_segments(paths, duration):
     return segs
 
 
-def _normalize_clip(src, dst, seconds):
+def _normalize_clip(src, dst, seconds, W, H):
     """Re-encode one clip to 1080x1920 / 30fps H.264 (fast, single thread) so clips can be joined."""
-    W, H, FPS = S.OUT_W, S.OUT_H, S.OUT_FPS
+    FPS = S.OUT_FPS
     cmd = [FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-nostdin", "-threads", "1",
            "-t", f"{seconds:.3f}", "-i", src, "-an",
            "-vf", f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1,fps={FPS},format=yuv420p",
@@ -252,7 +252,7 @@ def _normalize_clip(src, dst, seconds):
         raise RuntimeError(f"Could not prepare clip {os.path.basename(src)}: {proc.stderr.strip()[-200:]}")
 
 
-def _write_background_list(segments, duration, workdir, job_id, bg_files, progress):
+def _write_background_list(segments, duration, workdir, job_id, bg_files, progress, W, H):
     """
     ffmpeg concat list for the background: the chosen clips cycled until `duration` is covered.
     With several different clips, each is normalized first so they share one codec/size
@@ -265,7 +265,7 @@ def _write_background_list(segments, duration, workdir, job_id, bg_files, progre
             dst = os.path.join(workdir, f"{job_id}_bg{n}.mp4")
             bg_files.append(dst)
             need = max(t for q, t in segments if q == p)
-            _normalize_clip(p, dst, need)
+            _normalize_clip(p, dst, need, W, H)
             source[p] = dst
             progress(15 + 25 * (n + 1) / len(distinct), "Preparing footage")
 
@@ -282,13 +282,12 @@ def _write_background_list(segments, duration, workdir, job_id, bg_files, progre
     return list_path
 
 
-def _write_caption_sequence(chunks, duration, style, cap_dir):
+def _write_caption_sequence(chunks, duration, style, cap_dir, W, H):
     """
     Save each caption as a full-canvas transparent PNG and write an ffmpeg concat list that
     shows them back to back (blank PNG in any gaps). Streaming one image sequence keeps
     ffmpeg's memory flat no matter how many captions there are.
     """
-    W, H = S.OUT_W, S.OUT_H
     blank = os.path.join(cap_dir, "blank.png")
     Image.new("RGBA", (W, H), (0, 0, 0, 0)).save(blank)
 
@@ -322,12 +321,14 @@ def _write_caption_sequence(chunks, duration, style, cap_dir):
 
 def render_video(*, text, out_path, voice_edge, speed, pitch, clip_paths, caption_style,
                  music_path=None, progress=lambda pct, stage: None, workdir=S.TEMP_DIR,
-                 job_id="job"):
+                 job_id="job", out_width=S.DEFAULT_WIDTH):
     """
     Build the final reel. Returns (duration_seconds, truncated_flag).
     `progress(pct, stage)` is called as the job advances.
     """
-    W, H, FPS = S.OUT_W, S.OUT_H, S.OUT_FPS
+    W = max(360, int(out_width) // 2 * 2)
+    H = W * 16 // 9 // 2 * 2
+    FPS = S.OUT_FPS
     text = clean_text(text)
     if not text:
         raise ValueError("The story is empty.")
@@ -348,12 +349,12 @@ def render_video(*, text, out_path, voice_edge, speed, pitch, clip_paths, captio
 
         progress(15, "Preparing footage")
         segments = _plan_segments(clip_paths, duration)
-        bg_list = _write_background_list(segments, duration, workdir, job_id, bg_files, progress)
+        bg_list = _write_background_list(segments, duration, workdir, job_id, bg_files, progress, W, H)
 
         progress(40, "Setting captions")
         os.makedirs(cap_dir, exist_ok=True)
         list_path = _write_caption_sequence(build_chunks(text, words, duration), duration,
-                                            caption_style, cap_dir)
+                                            caption_style, cap_dir, W, H)
 
         # ---- inputs (footage and captions are each ONE sequential input: low memory)
         cmd = [FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-nostdin"]

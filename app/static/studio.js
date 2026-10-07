@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 
 const state = {
   user: null, cfg: null, assets: [], pinned: [], videos: [],
-  voice: 'oliver', gender: 'all', music: null, caption: 'cut_paper',
+  voice: 'oliver', gender: 'all', music: null, caption: 'cut_paper', quality: 720,
   current: null,            // video object currently shown in the phone
   pollTimer: null, previewAudio: null, previewBusy: false,
 };
@@ -30,10 +30,49 @@ async function boot() {
   $('user-name').textContent = state.user.name.split(' ')[0].toUpperCase();
   $('avatar').textContent = state.user.name.trim()[0]?.toUpperCase() || '?';
   setCredits(state.user.credits);
-  renderVoices(); renderMusic(); renderCaptions(); updateEstimate(); bindUI();
+  state.quality = state.cfg.default_quality || 720;
+  renderVoices(); renderMusic(); renderCaptions(); renderQualities(); renderVerifyBanner(); updateEstimate(); bindUI();
   await Promise.all([loadAssets(), loadVideos()]);
   if (!state.pinned.length && state.assets.length) state.pinned = [state.assets[0].id];
   renderAssets(); renderSequence(); renderPreview(); startPolling();
+}
+
+function renderVerifyBanner() {
+  const u = state.user;
+  const show = u.verification_required && !u.email_verified;
+  $('verify-banner').classList.toggle('hidden', !show);
+  $('verify-banner').classList.toggle('flex', show);
+  $('verify-email').textContent = u.email;
+}
+
+function renderQualities() {
+  $('quality-options').innerHTML = state.cfg.qualities.map(q => {
+    const sel = q.width === state.quality;
+    const base = sel ? 'bg-secondary-container text-on-secondary-container border-2 border-on-surface tactile-shadow-sm'
+      : q.enabled ? 'bg-surface-container-lowest border border-outline-variant hover:border-on-surface'
+      : 'bg-surface-container-low border border-outline-variant opacity-60 cursor-not-allowed';
+    return `<button type="button" data-q="${q.width}" ${q.enabled ? '' : 'disabled'} class="${base} py-2 px-2 rounded text-xs text-left">
+      <span class="font-bold block">${escapeHtml(q.label)}${q.enabled ? '' : ' 🔒'}</span><span class="text-[10px] text-on-surface-variant">${escapeHtml(q.note)}</span></button>`;
+  }).join('');
+  const w = state.quality, h = Math.floor(w * 16 / 9 / 2) * 2;
+  $('spec-note').textContent = `${w}x${h} 30FPS • AAC 192kbps`;
+  $('quality-note').textContent = state.cfg.qualities.some(q => !q.enabled) ? 'HD unlocks on a bigger server' : '';
+}
+
+async function importReddit() {
+  const url = $('reddit-url').value.trim();
+  if (!url) return toast('Paste a Reddit post link first.', 'error');
+  const btn = $('btn-reddit'), label = $('reddit-label');
+  btn.disabled = true; label.textContent = 'Importing…';
+  try {
+    const r = await api('/api/reddit/import', { json: { url } });
+    $('story').value = r.text;
+    $('title').value = r.title;
+    updateEstimate(); renderPreview();
+    $('reddit-note').textContent = `Imported from r/${r.subreddit}${r.truncated ? ' (shortened to fit the length limit)' : ''}. Credit the author when you post it.`;
+    toast('Story imported!', 'ok');
+  } catch (e) { toast(e.message, 'error'); }
+  finally { btn.disabled = false; label.textContent = 'Import'; }
 }
 
 function setCredits(n) {
@@ -234,14 +273,17 @@ async function generate() {
     const res = await api('/api/videos', { json: {
       title: $('title').value.trim() || 'Untitled reel', text,
       voice: state.voice, speed: parseFloat($('speed').value), pitch: parseInt($('pitch').value, 10),
-      music: state.music, caption_style: state.caption, clip_ids: state.pinned,
+      music: state.music, caption_style: state.caption, quality: state.quality, clip_ids: state.pinned,
     } });
     setCredits(res.credits);
     state.current = res.video;
     state.videos.unshift(res.video);
     renderArchive(); renderPreview(); startPolling();
     $('screen').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } catch (e) { toast(e.message, 'error'); }
+  } catch (e) {
+    toast(e.message, 'error');
+    if (e.status === 403) { try { state.user = await api('/api/auth/me'); renderVerifyBanner(); } catch (_) {} }
+  }
 }
 
 function startPolling() {
@@ -359,6 +401,13 @@ function bindUI() {
   $('music-pills').onclick = e => { const b = e.target.closest('[data-music]'); if (b) { state.music = b.dataset.music || null; renderMusic(); } };
   $('caption-styles').onclick = e => { const b = e.target.closest('[data-cap]'); if (b) { state.caption = b.dataset.cap; renderCaptions(); } };
   $('btn-preview-voice').onclick = audition;
+  $('quality-options').onclick = e => { const b = e.target.closest('[data-q]'); if (b && !b.disabled) { state.quality = parseInt(b.dataset.q, 10); renderQualities(); } };
+  $('btn-reddit').onclick = importReddit;
+  $('reddit-url').addEventListener('keydown', e => { if (e.key === 'Enter') importReddit(); });
+  $('btn-resend').onclick = async () => {
+    try { await api('/api/auth/resend-verification', { method: 'POST' }); toast('Confirmation email sent. Check your inbox.', 'ok'); }
+    catch (e) { toast(e.message, 'error'); }
+  };
 
   $('asset-grid').onclick = async e => {
     const del = e.target.closest('[data-del-asset]');

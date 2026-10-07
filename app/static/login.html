@@ -20,7 +20,7 @@
 
   <div class="relative bg-[#fffdf0] rounded-xl border-2 border-on-surface tactile-shadow-lg p-6">
     <div class="absolute -top-3 left-8 w-6 h-6 rounded-full bg-error border-2 border-on-surface tactile-shadow-sm flex items-center justify-center z-20"><div class="w-2 h-2 rounded-full bg-surface-container-lowest"></div></div>
-    <div class="flex gap-1.5 bg-surface-container-highest/70 p-1 rounded-md border border-outline-variant mb-5">
+    <div id="tabs" class="flex gap-1.5 bg-surface-container-highest/70 p-1 rounded-md border border-outline-variant mb-5">
       <button id="tab-login" type="button" class="flex-1 py-1.5 rounded text-xs font-bold uppercase bg-surface-container-lowest border-2 border-on-surface tactile-shadow-sm">Log in</button>
       <button id="tab-register" type="button" class="flex-1 py-1.5 rounded text-xs font-bold uppercase text-on-surface-variant">Create account</button>
     </div>
@@ -34,14 +34,17 @@
         <label for="email" class="text-xs font-bold uppercase block mb-1">Email</label>
         <input id="email" type="email" autocomplete="email" class="w-full rounded border-2 border-on-surface bg-surface-container-lowest text-sm">
       </div>
-      <div>
+      <div id="pw-row">
         <label for="password" class="text-xs font-bold uppercase block mb-1">Password</label>
         <input id="password" type="password" autocomplete="current-password" class="w-full rounded border-2 border-on-surface bg-surface-container-lowest text-sm">
         <p id="pw-hint" class="hidden text-[11px] text-on-surface-variant mt-1">At least 8 characters.</p>
+        <button id="forgot-link" type="button" class="text-[11px] text-primary font-bold underline mt-1">Forgot password?</button>
       </div>
+      <p id="notice" class="hidden text-xs font-bold text-on-secondary-container bg-secondary-container border border-secondary rounded px-2 py-1"></p>
       <p id="error" class="hidden text-xs font-bold text-error bg-error-container border border-error rounded px-2 py-1"></p>
       <button id="submit" class="w-full bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container py-3 rounded-lg font-bold uppercase tracking-wide tactile-shadow border-2 border-on-surface active:translate-x-0.5 active:translate-y-0.5">Log in</button>
     </form>
+    <button id="back-link" type="button" class="hidden mx-auto mt-3 text-[11px] text-primary font-bold underline">← Back to log in</button>
     <p id="bonus" class="hidden text-[11px] text-center text-on-surface-variant mt-3">🎟️ New accounts start with 24 reel credits.</p>
   </div>
 </main>
@@ -54,6 +57,12 @@ const ACTIVE = ['bg-surface-container-lowest', 'border-2', 'border-on-surface', 
 
 function setMode(m) {
   mode = m;
+  const forgot = m === 'forgot';
+  $('pw-row').classList.toggle('hidden', forgot);
+  $('forgot-link').classList.toggle('hidden', m !== 'login');
+  $('back-link').classList.toggle('hidden', !forgot);
+  $('notice').classList.add('hidden');
+  $('tabs').classList.toggle('hidden', forgot);
   for (const [id, name] of [['tab-login', 'login'], ['tab-register', 'register']]) {
     ACTIVE.forEach(c => $(id).classList.toggle(c, m === name));
     $(id).classList.toggle('text-on-surface-variant', m !== name);
@@ -62,11 +71,13 @@ function setMode(m) {
   $('pw-hint').classList.toggle('hidden', m !== 'register');
   $('bonus').classList.toggle('hidden', m !== 'register');
   $('password').autocomplete = m === 'register' ? 'new-password' : 'current-password';
-  $('submit').textContent = m === 'register' ? 'Create account' : 'Log in';
+  $('submit').textContent = forgot ? 'Email me a reset link' : m === 'register' ? 'Create account' : 'Log in';
   $('error').classList.add('hidden');
 }
 $('tab-login').onclick = () => setMode('login');
 $('tab-register').onclick = () => setMode('register');
+$('forgot-link').onclick = () => setMode('forgot');
+$('back-link').onclick = () => setMode('login');
 
 function showError(msg) { $('error').textContent = msg; $('error').classList.remove('hidden'); }
 
@@ -74,6 +85,19 @@ $('form').addEventListener('submit', async e => {
   e.preventDefault();
   $('error').classList.add('hidden');
   const email = $('email').value.trim(), password = $('password').value, name = $('name').value.trim();
+  if (mode === 'forgot') {
+    if (!email) return showError('Enter your email address.');
+    $('submit').disabled = true;
+    try {
+      const r = await api('/api/auth/forgot-password', { json: { email } });
+      $('notice').textContent = r.email_enabled
+        ? 'If an account exists for that email, a reset link is on its way. Check your inbox and spam folder.'
+        : "Email sending isn't set up on this server yet, so no reset link can be sent. Contact the site owner.";
+      $('notice').classList.remove('hidden');
+    } catch (ex) { showError(ex.message); }
+    finally { $('submit').disabled = false; }
+    return;
+  }
   if (!email || !password) return showError('Enter your email and password.');
   if (mode === 'register' && !name) return showError('Enter your name.');
   if (mode === 'register' && password.length < 8) return showError('Password must be at least 8 characters.');

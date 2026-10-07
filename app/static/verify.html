@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Dolge – Confirm email</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>*, body, p, span, button, a, div, h1 { font-family: 'Courier Prime', monospace !important; }</style>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="/static/tailwind-config.js"></script>
+</head>
+<body class="bg-background text-on-surface parchment-grid min-h-screen flex items-center justify-center p-4">
+<main class="w-full max-w-md bg-[#fffdf0] rounded-xl border-2 border-on-surface tactile-shadow-lg p-6 text-center">
+  <div id="icon" class="text-4xl mb-2">✉️</div>
+  <h1 id="title" class="text-xl font-bold mb-2">Confirm your email</h1>
+  <p id="msg" class="text-sm text-on-surface-variant mb-5">One click and you're ready to make reels.</p>
+  <button id="go" class="bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container px-5 py-3 rounded-lg font-bold uppercase tracking-wide tactile-shadow border-2 border-on-surface">Confirm my email</button>
+  <a id="home" href="/" class="hidden bg-secondary-container text-on-secondary-container px-5 py-3 rounded-lg font-bold uppercase tracking-wide tactile-shadow border-2 border-on-surface inline-block">Open the studio</a>
+</main>
+<script src="/static/common.js"></script>
+<script>
+const token = new URLSearchParams(location.search).get('token') || '';
+history.replaceState(null, '', location.pathname);   // keep the token out of the address bar / history
+const $ = id => document.getElementById(id);
+if (!token) {
+  $('title').textContent = 'Link not valid';
+  $('msg').textContent = 'This confirmation link is incomplete. Open the link from your email again.';
+  $('go').classList.add('hidden');
+}
+$('go').onclick = async () => {
+  $('go').disabled = true;
+  try {
+    await api('/api/auth/verify-email', { json: { token } });
+    $('icon').textContent = '✅';
+    $('title').textContent = 'Email confirmed!';
+    $('msg').textContent = 'You can now generate reels.';
+    $('go').classList.add('hidden');
+    $('home').classList.remove('hidden');
+  } catch (e) {
+    $('icon').textContent = '⚠️';
+    $('title').textContent = 'Couldn’t confirm';
+    $('msg').textContent = e.message + ' Log in and use “Resend email” in the studio to get a new link.';
+    $('go').classList.add('hidden');
+    $('home').textContent = 'Go to log in';
+    $('home').classList.remove('hidden');
+  }
+};
+</script>
+</body></html>

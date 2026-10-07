@@ -54,10 +54,6 @@ MAX_STORY_CHARS = 4000
 MAX_DURATION = 55
 # Captions are always drawn on a 1080x1920 canvas, then scaled to the output size.
 CAP_W, CAP_H = 1080, 1920
-# Output size. 720 (720x1280) is light enough for small servers; set REELFORGE_OUT_WIDTH=1080
-# on a bigger machine for full HD.
-OUT_W = max(360, int(os.environ.get("REELFORGE_OUT_WIDTH", "720")) // 2 * 2)
-OUT_H = OUT_W * 16 // 9 // 2 * 2
 OUT_FPS = int(os.environ.get("REELFORGE_FPS", "30"))
 
 VOICES = [
@@ -83,3 +79,34 @@ CAPTION_STYLES = [
     {"id": "neon", "label": "✨ Neon Tape"},
 ]
 CAPTION_IDS = {c["id"] for c in CAPTION_STYLES}
+
+
+# --------------------------------------------------------------------------- quality options
+# Qualities users may pick. 1080p needs more RAM, so it is off unless REELFORGE_ALLOW_1080=1.
+ALLOW_1080 = os.environ.get("REELFORGE_ALLOW_1080", "0") == "1"
+QUALITIES = [
+    {"width": 720, "label": "720p", "note": "Fast, works everywhere", "enabled": True},
+    {"width": 1080, "label": "1080p HD", "note": "Sharper, slower, needs a bigger server", "enabled": ALLOW_1080},
+]
+ALLOWED_WIDTHS = {q["width"] for q in QUALITIES if q["enabled"]}
+DEFAULT_WIDTH = 720
+
+# --------------------------------------------------------------------------- email
+# Public address of the site, used in email links (e.g. https://app.example.com).
+APP_URL = os.environ.get("APP_URL", "").rstrip("/")
+MAIL_FROM = os.environ.get("MAIL_FROM", "Dolge <onboarding@resend.dev>")
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+SMTP_HOST = os.environ.get("SMTP_HOST", "")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+MAIL_ENABLED = bool(RESEND_API_KEY or SMTP_HOST)
+# Verification is only enforced when email can actually be sent; otherwise nobody could verify.
+REQUIRE_VERIFIED = MAIL_ENABLED
+VERIFY_TTL_HOURS = 24
+RESET_TTL_MINUTES = 60
+
+# --------------------------------------------------------------------------- reddit
+REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID", "")
+REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET", "")
+REDDIT_USER_AGENT = os.environ.get("REDDIT_USER_AGENT", "web:dolge-reel-studio:v1.0 (story import)")
