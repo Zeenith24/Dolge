@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+.env
+.env.*
+data/
+temp/
+output/
+logs/
+input_videos/
+stories/
+website.html
+test_simple.py
+e2e_vid.txt

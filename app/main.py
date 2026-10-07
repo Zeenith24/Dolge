@@ -73,6 +73,11 @@ app = FastAPI(title="Dolge Reel Studio", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=S.STATIC_DIR), name="static")
 
 
+@app.get("/healthz", include_in_schema=False)
+def healthz():
+    return {"ok": True}
+
+
 # --------------------------------------------------------------------------- helpers
 def _refund(db: Session, video: Video):
     with _credit_lock:
