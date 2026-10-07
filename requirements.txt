@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pyjwt
+python-multipart
+email-validator
+edge-tts
+moviepy==2.2.1
+pillow
+numpy
+imageio-ffmpeg
+gTTS
+psycopg[binary]

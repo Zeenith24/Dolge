@@ -1,0 +1,27 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+.env.*
+data/secret.key
+
+# App data (database, rendered videos, uploads, thumbnails, temp files)
+data/
+temp/
+output/
+logs/
+
+# Large media you add locally
+input_videos/*
+!input_videos/README.txt
+assets/music/*
+!assets/music/README.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

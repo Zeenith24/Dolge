@@ -1,0 +1,7 @@
+@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}.tactile-shadow{box-shadow:3px 3px 0px #1e1b19;}.tactile-shadow-sm{box-shadow:2px 2px 0px #1e1b19;}.tactile-shadow-lg{box-shadow:5px 5px 0px #1e1b19;}.treasure-shadow{box-shadow:6px 6px 0px #ae3115;}.parchment-grid{background-color:#fff8f5;background-image:radial-gradient(#8d716a 0.75px,transparent 0.75px);background-size:20px 20px;}.map-trail-dash{background-image:linear-gradient(to bottom,#ae3115 50%,transparent 50%);background-size:3px 14px;}.map-trail-dash-h{background-image:linear-gradient(to right,#ae3115 50%,transparent 50%);background-size:14px 3px;}
+@keyframes pulseGlow{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.pulse-badge{animation:pulseGlow 2.5s infinite ease-in-out;}
+
+.voice-card.active{background:rgb(249 226 135 / .3)}
+.btn-disabled{opacity:.55;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:100}

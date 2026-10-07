@@ -1,0 +1,796 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;800&amp;family=Courier+Prime:ital,wght@0,400;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet" class=""><style>*, body, h1, h2, h3, h4, h5, h6, p, span, button, input, textarea, a, label { font-family: 'Courier Prime', monospace !important; }</style><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}.tactile-shadow{box-shadow:3px 3px 0px #1e1b19;}.tactile-shadow-sm{box-shadow:2px 2px 0px #1e1b19;}.tactile-shadow-lg{box-shadow:5px 5px 0px #1e1b19;}.treasure-shadow{box-shadow:6px 6px 0px #ae3115;}.parchment-grid{background-color:#fff8f5;background-image:radial-gradient(#8d716a 0.75px,transparent 0.75px);background-size:20px 20px;}.map-trail-dash{background-image:linear-gradient(to bottom,#ae3115 50%,transparent 50%);background-size:3px 14px;}.map-trail-dash-h{background-image:linear-gradient(to right,#ae3115 50%,transparent 50%);background-size:14px 3px;}
+@keyframes pulseGlow{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.pulse-badge{animation:pulseGlow 2.5s infinite ease-in-out;}
+</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-secondary-fixed-variant":"#534600","on-secondary-fixed":"#221b00","primary-fixed-dim":"#ffb4a3","on-tertiary-fixed-variant":"#004c69","surface-tint":"#ae3115","primary":"#ae3115","background":"#fff8f5","on-primary-fixed":"#3d0600","inverse-primary":"#ffb4a3","on-error-container":"#93000a","surface-container-highest":"#e9e1dd","surface-dim":"#e0d8d5","error":"#ba1a1a","surface-container":"#f4ece8","surface-variant":"#e9e1dd","on-primary-fixed-variant":"#8c1900","on-secondary":"#ffffff","on-error":"#ffffff","on-surface-variant":"#59413c","outline":"#8d716a","error-container":"#ffdad6","outline-variant":"#e1bfb8","tertiary-fixed-dim":"#7bd0ff","surface-container-lowest":"#ffffff","surface-container-low":"#faf2ee","tertiary":"#00668a","on-primary":"#ffffff","secondary-fixed-dim":"#dcc66e","inverse-on-surface":"#f7efeb","on-tertiary-container":"#00364c","primary-fixed":"#ffdad2","on-surface":"#1e1b19","tertiary-fixed":"#c4e7ff","surface-container-high":"#eee7e3","on-tertiary":"#ffffff","tertiary-container":"#00a5de","secondary-fixed":"#f9e287","surface-bright":"#fff8f5","inverse-surface":"#33302d","secondary-container":"#f6df84","on-primary-container":"#661000","secondary":"#6e5e0d","on-secondary-container":"#726212","primary-container":"#ff6b4a","surface":"#fff8f5","on-background":"#1e1b19","on-tertiary-fixed":"#001e2c"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"margin-sm":"1rem","space-lg":"1.5rem","space-xl":"2.5rem","gutter-sm":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","margin":"2rem","gutter":"1.5rem","space-md":"1rem"},fontFamily:{"body-lg":["Plus Jakarta Sans"],"display-md-mobile":["Bricolage Grotesque"],"label-sm":["Courier Prime"],"label-lg":["Courier Prime"],"headline-lg":["Bricolage Grotesque"],"display-lg":["Bricolage Grotesque"],"display-md":["Bricolage Grotesque"],"display-lg-mobile":["Bricolage Grotesque"],"body-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"headline-md":["Bricolage Grotesque"],"label-md":["Courier Prime"]},fontSize:{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"500"}],"display-md-mobile":["28px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-sm":["10px",{"lineHeight":"13px","letterSpacing":"0.06em","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"18px","letterSpacing":"0.02em","fontWeight":"700"}],"headline-lg":["26px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"display-lg":["48px",{"lineHeight":"52px","letterSpacing":"-0.03em","fontWeight":"800"}],"display-md":["36px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-lg-mobile":["34px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"800"}],"body-md":["14px",{"lineHeight":"21px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"17px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"26px","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"400"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface parchment-grid min-h-screen relative selection:bg-secondary-fixed selection:text-on-secondary-fixed" style="font-family: &quot;Courier Prime&quot;, monospace;">
+<!-- TOP HEADER -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-low/95 backdrop-blur-sm border-b-2 border-dashed border-outline-variant shadow-sm"><div class="h-20 w-full px-4 md:px-margin flex items-center justify-between relative"><div class="flex items-center gap-space-md"><div class="relative -rotate-2 select-none group"><div class="absolute -top-2.5 left-2 w-10 h-4 bg-secondary-fixed/90 backdrop-blur-sm -rotate-6 z-20 pointer-events-none rounded-none border border-outline/30"></div><div class="flex items-center gap-space-xs bg-surface-container-lowest px-space-sm py-1 rounded tactile-shadow border-2 border-on-surface"><img alt="Dolge Studio Scrapbook Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VAs70GTwx6IpbMrFGLl_bnKYRv88FfxtmrN6TCWr4U8MFdO3TNuzLpbeCIvFlHyJKtXefWu4W5Fjm4f3XGnXe6wWzGlUoi8dldQOtd9ZpS1pnygFENt-F3IKbQ0I2vTvRSypGADaCmZZLNBblrH2ZGnNdMlIctNfPQwUbN_C8qbp616gIPVcP6LzyRPALBfKt22oP09wl_botSY8eCJqMWB-NxnrBTaW4hHAaPoxpc99Lqqyitxxjcrvo"><div class="flex flex-col"><span class="font-headline-md text-headline-md tracking-tight text-on-surface leading-none">Dolge</span><span class="font-label-sm text-[9px] uppercase tracking-widest text-primary font-bold">Cartography Desk</span></div></div></div>
+<!-- Compass Cartography Badge -->
+<div class="hidden lg:flex items-center gap-2 bg-surface-container-highest/80 border border-outline rounded-full px-3 py-1 shadow-xs"><span class="material-symbols-outlined text-primary text-base">explore</span><span class="font-label-sm text-[11px] font-bold uppercase text-on-surface-variant tracking-wider">Story Voyage Trail • Map No. 042</span></div></div>
+<!-- Quick Navigation Tabs -->
+<nav class="hidden md:flex items-center gap-1.5 h-full pt-space-sm"></nav>
+<div class="flex items-center gap-space-sm md:gap-space-md"><div class="relative bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded font-label-sm text-label-sm font-bold border-2 border-secondary tactile-shadow-sm rotate-1 flex items-center gap-1.5"><span class="material-symbols-outlined text-sm leading-none">confirmation_number</span><span class="">24 Credits</span></div><a class="bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary transition-all font-label-md text-label-md uppercase tracking-wider px-3.5 py-1.5 rounded tactile-shadow font-bold border-2 border-on-surface active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1" href="#milestone-treasure"><span class="material-symbols-outlined text-sm">flag</span><span class="">Create Your video<br></span></a><div class="relative select-none rotate-2 hidden sm:block"><div class="bg-surface-container-lowest p-1 pb-1.5 rounded-sm border-2 border-on-surface tactile-shadow-sm flex flex-col items-center"><img alt="Profile" class="w-7 h-7 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnpFq00t9ErCDHPSmcGYu5bK_YPuB_xCp4vd27p5D9RDP9u0B7bPHOygPLOiLNNyN24PrDgs1IOYNgBzVDhJ5njK1R7Br_LlDENNuOK1P4APHUUKWEIWWSwOMYykaq57aa4vP4SMoum1sdKcrkJYW4iqmvaiks5NsKl94Rk9FyJEc0rI-Plwwa_b-MO1RZ8EHbPnzqMJUTAUQDxEj7N8q14y4Wgur1AzUsfIkKsL2gIaRxQkBe02uT"><span class="font-label-sm text-[8px] text-on-surface-variant font-bold leading-none mt-0.5">PILOT</span></div></div></div></div></header>
+<main class="w-full pt-24 pb-20 bg-transparent min-h-screen">
+<div class="max-w-6xl mx-auto px-4 md:px-6">
+<!-- MAP BANNER & EXPEDITION INTRO -->
+<div class="relative bg-[#fcf6ea] border-2 border-on-surface rounded-xl p-5 md:p-6 mb-10 tactile-shadow-lg overflow-hidden" id="trail-overview">
+<!-- Tape decorations at corners -->
+<div class="absolute -top-3 left-10 w-28 h-6 bg-secondary-fixed/90 -rotate-2 z-10 border border-outline/30"></div>
+<div class="absolute -top-3 right-12 w-28 h-6 bg-tertiary-fixed/85 rotate-3 z-10 border border-outline/30"></div>
+<div class="absolute -bottom-3 right-24 w-24 h-5 bg-primary-fixed/80 rotate-1 z-10 border border-outline/30"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-2 border-dashed border-outline-variant pb-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded text-[11px] font-label-sm font-bold uppercase border border-on-surface -rotate-1">📜 Creator's Expedition Map</span>
+<span class="text-xs font-label-sm text-outline">Lat 35°N • Long 139°E</span>
+</div>
+<h1 class="font-display-lg text-2xl md:text-3xl lg:text-4xl text-on-surface tracking-tight leading-tight">
+            Follow the Trail to Craft Your Viral Reel
+          </h1>
+<p class="font-body-md text-on-surface-variant text-sm mt-1 max-w-2xl">
+            A guided scrapbook journey: write your tale, synthetically enchant narrator voices, scout aesthetic stock filmstrips, and reach the final treasure!
+          </p>
+</div>
+<!-- Compass dial aesthetic -->
+
+</div>
+<!-- INTERACTIVE MAP PROGRESS STEPPER -->
+<div class="mt-5 pt-1">
+<div class="font-label-sm text-xs font-bold uppercase text-on-surface-variant mb-3 flex items-center justify-between">
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-sm text-primary">route</span> Quest Trail Progression:</span>
+
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 relative">
+<!-- Step 1 -->
+<a class="relative group bg-secondary-fixed/40 hover:bg-secondary-fixed/70 border-2 border-on-surface rounded-lg p-2.5 tactile-shadow-sm transition-all text-left flex items-start gap-2.5" href="#milestone-1">
+<div class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container border-2 border-on-surface font-headline-md text-xs flex items-center justify-center shrink-0 font-bold">1</div>
+<div class="overflow-hidden">
+<span class="block font-label-sm text-[10px] font-bold text-primary uppercase tracking-wide">Stop One</span>
+<span class="font-headline-md text-xs font-bold text-on-surface block truncate">Story Haven</span>
+<span class="text-[10px] text-on-surface-variant font-label-sm">Script &amp; Narrative</span>
+</div>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary animate-ping"></span>
+</a>
+<!-- Step 2 -->
+<a class="group bg-surface-container-lowest hover:bg-surface-container-low border-2 border-on-surface rounded-lg p-2.5 tactile-shadow-sm transition-all text-left flex items-start gap-2.5" href="#milestone-2">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface border-2 border-on-surface font-headline-md text-xs flex items-center justify-center shrink-0 font-bold">2</div>
+<div class="overflow-hidden">
+<span class="block font-label-sm text-[10px] font-bold text-on-surface-variant uppercase tracking-wide">Stop Two</span>
+<span class="font-headline-md text-xs font-bold text-on-surface block truncate">Voice Lab Cave</span>
+<span class="text-[10px] text-on-surface-variant font-label-sm">Narrator &amp; Audio</span>
+</div>
+</a>
+<!-- Step 3 -->
+<a class="group bg-surface-container-lowest hover:bg-surface-container-low border-2 border-on-surface rounded-lg p-2.5 tactile-shadow-sm transition-all text-left flex items-start gap-2.5" href="#milestone-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface border-2 border-on-surface font-headline-md text-xs flex items-center justify-center shrink-0 font-bold">3</div>
+<div class="overflow-hidden">
+<span class="block font-label-sm text-[10px] font-bold text-on-surface-variant uppercase tracking-wide">Stop Three</span>
+<span class="font-headline-md text-xs font-bold text-on-surface block truncate">Video Island</span>
+<span class="text-[10px] text-on-surface-variant font-label-sm">Stock &amp; Uploads</span>
+</div>
+</a>
+<!-- Treasure -->
+
+</div>
+</div>
+</div>
+<!-- ======================================================== -->
+<!-- QUEST TRAIL WINDING SECTION -->
+<!-- ======================================================== -->
+<div class="relative space-y-12">
+<!-- ==================================================== -->
+<!-- MILESTONE 1: STORY HAVEN -->
+<!-- ==================================================== -->
+<section class="relative scroll-mt-28" id="milestone-1">
+<!-- Milestone Header Marker -->
+<div class="flex items-center gap-3 mb-3">
+<div class="w-9 h-9 rounded-full bg-secondary-container border-2 border-on-surface flex items-center justify-center font-headline-md text-base font-bold tactile-shadow-sm">
+            1
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-lg text-xl md:text-2xl text-on-surface tracking-tight">Milestone 1: Story Haven</h2>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-[10px] px-2 py-0.5 rounded border border-outline/50 uppercase">Script Manuscript</span>
+</div>
+</div>
+<!-- The Manuscript / Scroll Pad Container -->
+<div class="relative bg-[#fffdf0] rounded-xl border-2 border-on-surface tactile-shadow-lg p-5 md:p-7 rotate-[-0.3deg]">
+<!-- Pushpins & Washi tape -->
+<div class="absolute -top-3 left-8 w-6 h-6 rounded-full bg-error border-2 border-on-surface tactile-shadow-sm flex items-center justify-center z-20">
+<div class="w-2 h-2 rounded-full bg-surface-container-lowest"></div>
+</div>
+<div class="absolute -top-3.5 right-12 w-28 h-6 bg-secondary-fixed/90 -rotate-3 z-20 border border-outline/30 flex items-center justify-center text-[10px] font-label-sm uppercase font-bold text-on-secondary-fixed">
+            Manuscript Pad
+          </div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b-2 border-dashed border-outline-variant/60 pb-3 mb-4">
+<div>
+<span class="font-label-sm text-xs uppercase font-bold tracking-widest text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">history_edu</span> Tell Your Tale or Paste Your Script
+              </span>
+<p class="font-label-sm text-[11px] text-outline mt-0.5">Write concise narrative beats or hooked intro lines for vertical reels.</p>
+</div>
+<!-- Quick prompt generator -->
+<button class="self-start md:self-auto bg-surface-container-highest hover:bg-secondary-fixed text-on-surface font-label-sm text-xs px-3 py-1.5 rounded border-2 border-on-surface tactile-shadow-sm transition-transform active:scale-95 flex items-center gap-1.5" id="btn-spark" type="button">
+<span class="material-symbols-outlined text-sm text-secondary">casino</span>
+<span class="">Spark Random Story</span>
+</button>
+</div>
+<!-- Ruled Paper Effect Container -->
+<div class="relative pl-6 pr-2 bg-[linear-gradient(transparent_27px,#e3dac9_28px)] bg-[length:100%_28px] rounded">
+<!-- Red vertical margin line -->
+<div class="absolute left-4 top-0 bottom-0 w-0.5 bg-error/40 pointer-events-none"></div>
+<textarea class="w-full bg-transparent border-0 resize-y font-label-md text-sm md:text-base text-on-surface leading-[28px] focus:outline-none focus:ring-0 p-0 placeholder:text-on-surface-variant/50" id="story-textarea" placeholder="Tell your tale or paste your script... It was a rainy Tuesday in Tokyo when I accidentally discovered this hidden vinyl jazz cafe down an alleyway..." rows="6">It was a rainy Tuesday in Tokyo when I accidentally discovered this hidden vinyl jazz cafe down an alleyway... The coffee tasted like roasted hazelnuts and old memories. Rain tapped the window as Duke Ellington spun softly on a 1968 turntable.</textarea>
+</div>
+<!-- Quick Tone Modifiers / Stamp Stickers -->
+<div class="mt-5 pt-3 border-t border-outline-variant/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-xs uppercase font-bold text-on-surface-variant flex items-center gap-1">
+<span class="">✨ Tone Stamps:</span>
+</span>
+<div class="flex flex-wrap gap-2">
+<button class="bg-secondary-fixed/90 hover:bg-secondary-fixed text-on-secondary-fixed font-label-sm text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm -rotate-1 transition-transform active:scale-95 flex items-center gap-1" onclick="injectModifier('Cinematic')" type="button">
+<span class="">🎬 Cinematic</span>
+</button>
+<button class="bg-primary-fixed hover:bg-primary-fixed-dim text-on-primary-fixed font-label-sm text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm rotate-2 transition-transform active:scale-95 flex items-center gap-1" onclick="injectModifier('Suspense')" type="button">
+<span class="">⚡ Mystery / Hook</span>
+</button>
+<button class="bg-tertiary-fixed hover:bg-tertiary-fixed-dim text-on-tertiary-fixed font-label-sm text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm -rotate-2 transition-transform active:scale-95 flex items-center gap-1" onclick="injectModifier('Gen-Z')" type="button">
+<span class="">🔥 Upbeat Paced</span>
+</button>
+<button class="bg-surface-container-highest hover:bg-surface-container-high text-on-surface font-label-sm text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm rotate-1 transition-transform active:scale-95 flex items-center gap-1" onclick="injectModifier('Humor')" type="button">
+<span class="">☕ Nostalgic Cozy</span>
+</button>
+</div>
+</div>
+<div class="font-label-sm text-[11px] text-on-surface-variant self-end sm:self-auto">
+              Approx. 16.4 seconds of voiceover
+            </div>
+</div>
+</div>
+<!-- DASHED VOYAGE TRAIL TO MILESTONE 2 -->
+<div class="flex flex-col items-center justify-center my-6 py-2">
+<div class="flex items-center gap-2 text-primary font-label-sm text-xs font-bold tracking-widest uppercase">
+<span class="material-symbols-outlined text-base">footprint</span>
+<span class="">Follow the ink trail down the slope...</span>
+<span class="material-symbols-outlined text-base">south</span>
+</div>
+<div class="h-10 w-0.5 border-l-2 border-dashed border-primary my-1"></div>
+</div>
+</section>
+<!-- ==================================================== -->
+<!-- MILESTONE 2: VOICE LAB CAVE -->
+<!-- ==================================================== -->
+<section class="relative scroll-mt-28" id="milestone-2">
+<!-- Milestone Header Marker -->
+<div class="flex items-center gap-3 mb-3">
+<div class="w-9 h-9 rounded-full bg-tertiary-fixed border-2 border-on-surface flex items-center justify-center font-headline-md text-base font-bold tactile-shadow-sm">
+            2
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-lg text-xl md:text-2xl text-on-surface tracking-tight">Milestone 2: Voice Lab Cave</h2>
+<span class="bg-primary-container text-on-primary-container font-label-sm text-[10px] px-2 py-0.5 rounded font-bold border border-on-surface">TYPE-II AUDIO FORGE</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl border-2 border-on-surface tactile-shadow-lg p-5 md:p-7 rotate-[0.4deg] relative">
+<!-- Translucent tape strip at corner -->
+<div class="absolute -top-3 right-8 w-24 h-5 bg-tertiary-fixed/80 rotate-3 z-20 pointer-events-none border border-outline/20"></div>
+<!-- Subheader & Gender Filters -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-on-surface pb-4 mb-5">
+<div>
+<h3 class="font-headline-md text-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">record_voice_over</span> Choose Narrator &amp; Soundtrack
+              </h3>
+<p class="font-label-sm text-xs text-on-surface-variant">Filter by character profile and mood for synthetic narration.</p>
+</div>
+<!-- Gender Cut-out Filter Tags -->
+<div class="flex items-center gap-1.5 bg-surface-container-highest/70 p-1 rounded-md border border-outline-variant">
+<span class="font-label-sm text-[10px] uppercase font-bold text-on-surface-variant px-1.5">Voice Gender:</span>
+<button class="gender-tag bg-surface-container-lowest border-2 border-on-surface font-label-sm text-xs font-bold px-2.5 py-0.5 rounded tactile-shadow-sm text-on-surface" onclick="filterGender('all', this)" type="button">All</button>
+<button class="gender-tag bg-transparent hover:bg-surface-container-lowest font-label-sm text-xs px-2.5 py-0.5 rounded text-on-surface-variant" onclick="filterGender('male', this)" type="button">Male</button>
+<button class="gender-tag bg-transparent hover:bg-surface-container-lowest font-label-sm text-xs px-2.5 py-0.5 rounded text-on-surface-variant" onclick="filterGender('female', this)" type="button">Female</button>
+<button class="gender-tag bg-transparent hover:bg-surface-container-lowest font-label-sm text-xs px-2.5 py-0.5 rounded text-on-surface-variant" onclick="filterGender('nonbinary', this)" type="button">Neutral</button>
+</div>
+</div>
+<!-- Narrator Voice Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6" id="voice-grid">
+<!-- Voice 1: Oliver -->
+<label class="voice-card active relative bg-secondary-fixed/30 border-2 border-on-surface rounded-lg p-3 cursor-pointer tactile-shadow-sm hover:-translate-y-0.5 transition-transform block" data-gender="male" data-voice="Oliver">
+<input checked="" class="sr-only" name="narrator" type="radio" value="oliver">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="text-2xl">🎙️</span>
+<div>
+<span class="font-headline-md text-sm font-bold block text-on-surface">Oliver</span>
+<span class="font-label-sm text-[10px] text-primary font-bold">Deep Vintage Storyteller (Male)</span>
+</div>
+</div>
+<span class="voice-check w-5 h-5 rounded-full bg-secondary-container border border-on-surface flex items-center justify-center font-bold text-xs">✓</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant mt-2">Warm vinyl grain tone, ideal for nostalgic travel and retro documentaries.</p>
+</label>
+<!-- Voice 2: Aria -->
+<label class="voice-card relative bg-surface-container-lowest border-2 border-on-surface rounded-lg p-3 cursor-pointer tactile-shadow-sm hover:-translate-y-0.5 transition-transform block" data-gender="female" data-voice="Aria">
+<input class="sr-only" name="narrator" type="radio" value="aria">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="text-2xl">✨</span>
+<div>
+<span class="font-headline-md text-sm font-bold block text-on-surface">Aria</span>
+<span class="font-label-sm text-[10px] text-secondary font-bold">Warm &amp; Whimsical Docu (Female)</span>
+</div>
+</div>
+<span class="voice-check hidden w-5 h-5 rounded-full bg-secondary-container border border-on-surface items-center justify-center font-bold text-xs">✓</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant mt-2">Crisp, curious, and gentle cadence. Great for cafes, lifestyle, and books.</p>
+</label>
+<!-- Voice 3: Kai -->
+<label class="voice-card relative bg-surface-container-lowest border-2 border-on-surface rounded-lg p-3 cursor-pointer tactile-shadow-sm hover:-translate-y-0.5 transition-transform block" data-gender="male" data-voice="Kai">
+<input class="sr-only" name="narrator" type="radio" value="kai">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="text-2xl">⚡</span>
+<div>
+<span class="font-headline-md text-sm font-bold block text-on-surface">Kai</span>
+<span class="font-label-sm text-[10px] text-tertiary font-bold">Gritty Noir &amp; Suspense (Male)</span>
+</div>
+</div>
+<span class="voice-check hidden w-5 h-5 rounded-full bg-secondary-container border border-on-surface items-center justify-center font-bold text-xs">✓</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant mt-2">Low gravelly register for mystery hooks, eerie twists, and street stories.</p>
+</label>
+<!-- Voice 4: Luna -->
+<label class="voice-card relative bg-surface-container-lowest border-2 border-on-surface rounded-lg p-3 cursor-pointer tactile-shadow-sm hover:-translate-y-0.5 transition-transform block" data-gender="female" data-voice="Luna">
+<input class="sr-only" name="narrator" type="radio" value="luna">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="text-2xl">🌿</span>
+<div>
+<span class="font-headline-md text-sm font-bold block text-on-surface">Luna</span>
+<span class="font-label-sm text-[10px] text-secondary font-bold">Ethereal &amp; Melodic (Female)</span>
+</div>
+</div>
+<span class="voice-check hidden w-5 h-5 rounded-full bg-secondary-container border border-on-surface items-center justify-center font-bold text-xs">✓</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant mt-2">Soothing breathy vocal tone for ASMR travel clips and artistic reflections.</p>
+</label>
+<!-- Voice 5: Jasper -->
+<label class="voice-card relative bg-surface-container-lowest border-2 border-on-surface rounded-lg p-3 cursor-pointer tactile-shadow-sm hover:-translate-y-0.5 transition-transform block" data-gender="male" data-voice="Jasper">
+<input class="sr-only" name="narrator" type="radio" value="jasper">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="text-2xl">🔥</span>
+<div>
+<span class="font-headline-md text-sm font-bold block text-on-surface">Jasper</span>
+<span class="font-label-sm text-[10px] text-primary font-bold">Energetic Viral Hook (Male)</span>
+</div>
+</div>
+<span class="voice-check hidden w-5 h-5 rounded-full bg-secondary-container border border-on-surface items-center justify-center font-bold text-xs">✓</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant mt-2">Punchy modern creator delivery engineered to capture the first 2 seconds.</p>
+</label>
+<!-- Voice 6: Echo -->
+<label class="voice-card relative bg-surface-container-lowest border-2 border-on-surface rounded-lg p-3 cursor-pointer tactile-shadow-sm hover:-translate-y-0.5 transition-transform block" data-gender="nonbinary" data-voice="Echo">
+<input class="sr-only" name="narrator" type="radio" value="echo">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="text-2xl">📻</span>
+<div>
+<span class="font-headline-md text-sm font-bold block text-on-surface">Echo</span>
+<span class="font-label-sm text-[10px] text-outline font-bold">Lofi Radio Host (Neutral)</span>
+</div>
+</div>
+<span class="voice-check hidden w-5 h-5 rounded-full bg-secondary-container border border-on-surface items-center justify-center font-bold text-xs">✓</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant mt-2">Smooth, balanced late-night broadcast tone with natural inflection.</p>
+</label>
+</div>
+<!-- Audio Controls: Pacing, Pitch & Audition Cassette -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-surface-container-highest/60 rounded-lg p-4 border border-outline-variant">
+<!-- Pacing & Tuning -->
+<div class="md:col-span-5 grid grid-cols-2 gap-3">
+<div>
+<div class="flex justify-between font-label-sm text-xs mb-1 text-on-surface-variant font-bold">
+<span class="">VOICE PACE</span>
+<span class="text-primary font-bold" id="speed-val">1.05x</span>
+</div>
+<input class="w-full accent-primary cursor-pointer" max="1.5" min="0.75" oninput="document.getElementById('speed-val').innerText = this.value + 'x'" step="0.05" type="range" value="1.05">
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-xs mb-1 text-on-surface-variant font-bold">
+<span class="">PITCH WARMTH</span>
+<span class="text-secondary font-bold" id="pitch-val">+2st</span>
+</div>
+<input class="w-full accent-secondary cursor-pointer" max="6" min="-6" oninput="document.getElementById('pitch-val').innerText = (this.value &gt; 0 ? '+' : '') + this.value + 'st'" step="1" type="range" value="2">
+</div>
+</div>
+<!-- Atmosphere Soundtrack Selector -->
+<div class="md:col-span-4">
+<label class="font-label-sm text-xs font-bold uppercase text-on-surface block mb-1.5">Atmosphere Soundtrack</label>
+<div class="grid grid-cols-2 gap-1.5">
+<button class="audio-pill bg-secondary-container border-2 border-on-surface py-1 px-1.5 rounded text-left font-label-sm text-[11px] tactile-shadow-sm font-bold text-on-secondary-container truncate" type="button">
+                  ☕ Rain &amp; Vinyl
+                </button>
+<button class="audio-pill bg-surface-container-lowest border-2 border-on-surface py-1 px-1.5 rounded text-left font-label-sm text-[11px] hover:bg-secondary-fixed/50 font-bold text-on-surface truncate" type="button">
+                  🎸 Acoustic Sunset
+                </button>
+<button class="audio-pill bg-surface-container-lowest border-2 border-on-surface py-1 px-1.5 rounded text-left font-label-sm text-[11px] hover:bg-secondary-fixed/50 font-bold text-on-surface truncate" type="button">
+                  🌃 Lo-Fi Tokyo
+                </button>
+<button class="audio-pill bg-surface-container-lowest border-2 border-on-surface py-1 px-1.5 rounded text-left font-label-sm text-[11px] hover:bg-secondary-fixed/50 font-bold text-on-surface truncate" type="button">
+                  🎻 Orchestral Mystery
+                </button>
+</div>
+</div>
+<!-- Audition Button -->
+<div class="md:col-span-3">
+<button class="w-full bg-surface-container-lowest hover:bg-surface-container-high text-on-surface border-2 border-on-surface rounded-lg p-2.5 font-label-md text-xs uppercase tracking-wider tactile-shadow-sm flex flex-col items-center justify-center gap-1 transition-transform active:translate-x-0.5 active:translate-y-0.5" id="btn-preview-voice" type="button">
+<span class="material-symbols-outlined text-primary text-xl">play_circle</span>
+<span class="font-bold">Audition Preview (4.2s)</span>
+<span class="text-[9px] text-outline font-label-sm">Oliver • 48kHz WAV</span>
+</button>
+</div>
+</div>
+</div>
+<!-- DASHED VOYAGE TRAIL TO MILESTONE 3 -->
+<div class="flex flex-col items-center justify-center my-6 py-2">
+<div class="flex items-center gap-2 text-primary font-label-sm text-xs font-bold tracking-widest uppercase">
+<span class="material-symbols-outlined text-base">sailing</span>
+<span class="">Cross the ink strait to Video Island...</span>
+<span class="material-symbols-outlined text-base">south</span>
+</div>
+<div class="h-10 w-0.5 border-l-2 border-dashed border-primary my-1"></div>
+</div>
+</section>
+<!-- ==================================================== -->
+<!-- MILESTONE 3: VIDEO VAULT ISLAND -->
+<!-- ==================================================== -->
+<section class="relative scroll-mt-28" id="milestone-3">
+<!-- Milestone Header Marker -->
+<div class="flex items-center gap-3 mb-8">
+<div class="w-9 h-9 rounded-full bg-primary-fixed border-2 border-on-surface flex items-center justify-center font-headline-md text-base font-bold tactile-shadow-sm">
+            3
+          </div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-lg text-xl md:text-2xl text-on-surface tracking-tight">Milestone 3: Video Vault Island</h2>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-[10px] px-2 py-0.5 rounded font-bold border border-on-surface">9:16 VERTICAL REELS</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl border-2 border-on-surface tactile-shadow-lg p-5 md:p-7 rotate-[-0.2deg] relative">
+<!-- Manila folder tab top overhang -->
+<div class="absolute -top-7 left-6 bg-surface-container-low border-t-2 border-x-2 border-on-surface rounded-t-md px-4 py-1 flex items-center gap-2 shadow-none z-10">
+<span class="material-symbols-outlined text-sm text-secondary">folder_open</span>
+<span class="font-label-sm text-xs font-bold uppercase tracking-wider text-on-surface">Curated Film Vault &amp; Uploads</span>
+</div>
+<!-- Washi tape -->
+<div class="absolute -top-3 right-12 w-24 h-5 bg-secondary-fixed/80 -rotate-2 z-20 pointer-events-none border border-outline/30"></div>
+<!-- Dual Choice Layout: Upload footage OR Pick Curated Stock -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6 pt-2">
+<!-- Choice A: Custom Footage Dropzone -->
+<div class="lg:col-span-4 flex flex-col">
+<span class="font-label-sm text-xs uppercase font-bold text-on-surface mb-2 flex items-center gap-1.5">
+<span class="bg-secondary-container text-on-secondary-container w-4 h-4 rounded-full flex items-center justify-center text-[10px]">A</span>
+<span class="">Drop / Upload Your Footage</span>
+</span>
+<div class="border-2 border-dashed border-outline rounded-lg p-5 bg-surface-container-lowest/90 text-center hover:bg-surface-container-lowest transition-colors cursor-pointer group flex-1 flex flex-col items-center justify-center tactile-shadow-sm min-h-[180px]">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border-2 border-on-surface flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary text-2xl">cloud_upload</span>
+</div>
+<div class="font-label-md text-xs font-bold uppercase text-on-surface">Pin Custom Clips &amp; Polaroids</div>
+<p class="font-label-sm text-[11px] text-on-surface-variant mt-1">Drag vertical MP4/MOV or click to browse camera roll</p>
+<div class="mt-3 inline-block bg-surface-container-highest px-2 py-0.5 rounded text-[10px] font-label-sm text-outline border border-outline/40">
+                  Auto-synced to 9:16 vertical
+                </div>
+</div>
+</div>
+<!-- Choice B: Curated Stock Grid -->
+<div class="lg:col-span-8 flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-xs uppercase font-bold text-on-surface flex items-center gap-1.5">
+<span class="bg-secondary-container text-on-secondary-container w-4 h-4 rounded-full flex items-center justify-center text-[10px]">B</span>
+<span class="">Discover Curated Reel Stock (Click to Pin)</span>
+</span>
+<span class="font-label-sm text-[11px] text-primary font-bold">4 Clips Pinned</span>
+</div>
+<!-- 4 Stock Cards in a row/grid -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+<!-- Clip 1 -->
+<div class="stock-card relative bg-surface-container-lowest border-2 border-on-surface rounded p-2 tactile-shadow-sm hover:-translate-y-0.5 transition-all group">
+<div class="relative w-full aspect-[9/13] bg-surface-dim rounded overflow-hidden mb-1.5 border border-on-surface">
+<img class="w-full h-full object-cover" data-alt="Cinematic vertical shot of Tokyo neon rain alley" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD63a9SXSzylQmM7pjs1hO_0WGi-jD2IxqNvQR5ZIGmlJnA3Uj7p6G3fmNFrMrKXOPbwMSMyDWnVOFj7KGa5oUnkEhvxe6D4YytVC_UDevSeFFjIhYzFDrcjQzStcYWfPU6pK7i3VJVSYzMCwuiRkMwMyn7ZtfISe0804erNlvkvfBQY4du_Dt-yMBJ0jlQF5Iiyh2a3jEpFH3o-Ohs8LQihTMG797v4iW7ZhZH-8yBd7BDNY0RWQOV">
+<div class="absolute top-1 left-1 bg-primary-container text-on-primary-container px-1 py-0.5 rounded text-[9px] font-label-sm font-bold border border-on-surface">
+                      HOOK ● 4.2s
+                    </div>
+<div class="absolute top-1 right-1 w-5 h-5 bg-secondary-fixed text-on-secondary-fixed rounded-full border border-on-surface flex items-center justify-center shadow text-xs font-bold">
+                      ✓
+                    </div>
+</div>
+<div class="font-label-sm text-[11px] font-bold text-on-surface truncate">Tokyo Rain Alley</div>
+<button class="w-full mt-1 bg-secondary-fixed text-on-secondary-fixed text-[10px] font-label-sm uppercase font-bold py-0.5 rounded border border-on-surface" type="button">
+                    Pinned ✓
+                  </button>
+</div>
+<!-- Clip 2 -->
+<div class="stock-card relative bg-surface-container-lowest border-2 border-on-surface rounded p-2 tactile-shadow-sm hover:-translate-y-0.5 transition-all group">
+<div class="relative w-full aspect-[9/13] bg-surface-dim rounded overflow-hidden mb-1.5 border border-on-surface">
+<img class="w-full h-full object-cover" data-alt="Pouring artisanal drip coffee" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpvLbOc39_-DdLC920UTsn0AyRnwsv9T9nETfHwVlfgZusIxJ2ibc6XzLrtXYGnz_UaAVJ4ZbmFJIUGqIzn_39vQEEwaqLx5zDKupECgmzStCBkY7V2HlWkxZtv5vuCqdb2k1DUQeFecX8nXU2gOS3KwSRYut7SIo_hk-TjRcIFKJ9q8y20KN4kgVn0L4Emp_0ISdbKVY9RUJTmmWkL6cf7nXpxbNNtwE688s9Wr9DQ8bGOnFB1bHJ">
+<div class="absolute top-1 left-1 bg-surface-container-lowest/90 text-on-surface px-1 py-0.5 rounded text-[9px] font-label-sm font-bold border border-on-surface">
+                      BEAT ● 3.8s
+                    </div>
+<div class="absolute top-1 right-1 w-5 h-5 bg-secondary-fixed text-on-secondary-fixed rounded-full border border-on-surface flex items-center justify-center shadow text-xs font-bold">
+                      ✓
+                    </div>
+</div>
+<div class="font-label-sm text-[11px] font-bold text-on-surface truncate">Hand-Drip Coffee</div>
+<button class="w-full mt-1 bg-secondary-fixed text-on-secondary-fixed text-[10px] font-label-sm uppercase font-bold py-0.5 rounded border border-on-surface" type="button">
+                    Pinned ✓
+                  </button>
+</div>
+<!-- Clip 3 -->
+<div class="stock-card relative bg-surface-container-lowest border-2 border-on-surface rounded p-2 tactile-shadow-sm hover:-translate-y-0.5 transition-all group">
+<div class="relative w-full aspect-[9/13] bg-surface-dim rounded overflow-hidden mb-1.5 border border-on-surface">
+<img class="w-full h-full object-cover" data-alt="Turntable vinyl record spinning" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7ioZFmo99xKvLXoKzzRERckSWzhY6u1xRF_eQ-KaemZraLiwOLJBylaPx59RMiUK-jIa00kf6JuI0MzYCotvj7sZHrWDFpcJkfeSa2rTYi5_NAcGtGbPDvTx514hkp5xCO2ZLy1b3FcWuXw3sunqkF46n3o086Pm7O0A_H7eRYjFOguNtG9N2yzx6SYf6Com6YjDlxYPONevsla-ZvBiXtCEJZv47-rTL_bwxLYeB5ps0CICzdLdU">
+<div class="absolute top-1 left-1 bg-surface-container-lowest/90 text-on-surface px-1 py-0.5 rounded text-[9px] font-label-sm font-bold border border-on-surface">
+                      BEAT ● 3.5s
+                    </div>
+<div class="absolute top-1 right-1 w-5 h-5 bg-secondary-fixed text-on-secondary-fixed rounded-full border border-on-surface flex items-center justify-center shadow text-xs font-bold">
+                      ✓
+                    </div>
+</div>
+<div class="font-label-sm text-[11px] font-bold text-on-surface truncate">Vintage Vinyl Arm</div>
+<button class="w-full mt-1 bg-secondary-fixed text-on-secondary-fixed text-[10px] font-label-sm uppercase font-bold py-0.5 rounded border border-on-surface" type="button">
+                    Pinned ✓
+                  </button>
+</div>
+<!-- Clip 4 -->
+<div class="stock-card relative bg-surface-container-lowest border-2 border-on-surface rounded p-2 tactile-shadow-sm hover:-translate-y-0.5 transition-all group">
+<div class="relative w-full aspect-[9/13] bg-surface-dim rounded overflow-hidden mb-1.5 border border-on-surface">
+<img class="w-full h-full object-cover" data-alt="Subway train window at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXKBSLkxw6ljBuTuPlms8Lwrf3Zrg680i1NDj-1aK8hLCE0ZvRjHiK_2Ep1GDa5GMp4o8UmKzIWUTiGD-9T3F_fAObK1a_NM3zQMe8CRy9r15QlMukOb_mLmmkq7_gA0s_NBp-zBPeNZDKT_k1LrNSyBvrW3DH9WIlPi2BKpOiRFPI9zuk1aHGRnM3dIB85CYSwUQEjp2pzj8JvG2-Qe7irbmnHB9L1atf0kZgV-tkZ17X6-sgR_wk">
+<div class="absolute top-1 left-1 bg-surface-container-lowest/90 text-on-surface px-1 py-0.5 rounded text-[9px] font-label-sm font-bold border border-on-surface">
+                      OUTRO ● 5.1s
+                    </div>
+<div class="absolute top-1 right-1 w-5 h-5 bg-secondary-fixed text-on-secondary-fixed rounded-full border border-on-surface flex items-center justify-center shadow text-xs font-bold">
+                      ✓
+                    </div>
+</div>
+<div class="font-label-sm text-[11px] font-bold text-on-surface truncate">Subway Sunset</div>
+<button class="w-full mt-1 bg-secondary-fixed text-on-secondary-fixed text-[10px] font-label-sm uppercase font-bold py-0.5 rounded border border-on-surface" type="button">
+                    Pinned ✓
+                  </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pinned Sequence Timeline Strip -->
+<div class="border-t-2 border-on-surface pt-4">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-xs uppercase font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">attachment</span>
+<span class="">Active Sequence Trail (4 Clips Assembled)</span>
+</span>
+<span class="font-label-sm text-xs font-bold bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded border border-on-surface">
+                16.6s Reel Length
+              </span>
+</div>
+<div class="grid grid-cols-4 gap-2 bg-surface-container-highest p-2.5 rounded-lg border-2 border-on-surface">
+<div class="bg-surface-container-lowest p-1.5 rounded border border-on-surface text-center">
+<div class="w-full h-8 bg-on-surface/10 rounded overflow-hidden mb-1">
+<img alt="Tokyo Alley thumb" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQZWKQlR6g3KVkQWxQ2yB2VWH0yjPHxAIVHHHvyuEnjFeD-lSFgH_BreIUgZXNls08IHXLMzAV9xQVPk-mtfh7Tr1uVXKJIruWUS7XYF3Cue7zT8Rakq_HtVh3OizkPRcFZ2lzkyf3QLJ82IKmRNu3Ra08PVudlJ8jVrRw75LHRvTBj_TyRXsy3foJoQPtV8gTo9-6NG0e60R4ODCNKIX66F_kp4tOhTpn9tSpsbCtJ9s-U18Luy8f">
+</div>
+<span class="block font-label-sm text-[10px] font-bold text-on-surface truncate">01 Hook</span>
+<span class="text-[9px] font-label-sm text-on-surface-variant">0:00-0:04</span>
+</div>
+<div class="bg-surface-container-lowest p-1.5 rounded border border-on-surface text-center">
+<div class="w-full h-8 bg-on-surface/10 rounded overflow-hidden mb-1">
+<img alt="Coffee drip thumb" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwqFI6xsiLFNsgjJb28GbiZrd6cUqVCsAAN_DarQoDndYvWX26Aqiwz_VfbRf--f1B2_Bivzj-GSawR2c4-KjfCeLYNFcVfpUXUd_0gEdZqovTSA2pmeViO5pjMWwU7SJWryTWTIuuXwW8nm_bfHZw3NYg5Fc4g4dylXfKOsghe-PYIe0-ovyd8p4wi0avF3qR-CMu5XfB2LczokRzWWG-CxMZflI0OKdek5sB3FyJW6-xC0_MXnAN">
+</div>
+<span class="block font-label-sm text-[10px] font-bold text-on-surface truncate">02 Coffee</span>
+<span class="text-[9px] font-label-sm text-on-surface-variant">0:04-0:08</span>
+</div>
+<div class="bg-surface-container-lowest p-1.5 rounded border border-on-surface text-center">
+<div class="w-full h-8 bg-on-surface/10 rounded overflow-hidden mb-1">
+<img alt="Vinyl thumb" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-z0pAiwJOwgbSp4eE58K6JR0krwNKbeBLPrmu0D1KmGAtOhZ9m18VaQMs-MK3w_XKWCiXahGvNMStrBlanMpeuhpLJfBGTrxkH5Lo8smV20i4f2Hj9_An8iB9o_EyStPVFtlZ46qKkgHlZx7WzS8ZgmhpeyBl917BTaGl5f2pCWqzNsq30OKLMOAoafsYOwuhbKcOxpnMzFwzFARD83o3bBrEokHf3MUBCfJuvJiR1dSc_tYWJ8Pf">
+</div>
+<span class="block font-label-sm text-[10px] font-bold text-on-surface truncate">03 Jazz Cafe</span>
+<span class="text-[9px] font-label-sm text-on-surface-variant">0:08-0:12</span>
+</div>
+<div class="bg-surface-container-lowest p-1.5 rounded border border-on-surface text-center">
+<div class="w-full h-8 bg-on-surface/10 rounded overflow-hidden mb-1">
+<img alt="Train sunset thumb" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0oEq1vA2Gs3MfoMYevSQumZsVCkER5OFbKWyEukccP2CwDmBJgHY82sJKPQeayBMhR2jW2VXdCYziQG6sHvhUJXO4ObDAZawoi-H8nOBf-LxPsg-8i5rRIFO5BSAMbtmFGnwe4rYpgkFM0TIfwH1ziHzVy3KeFT0wyTKstNPPhDdecPA5PktBheUoshJeTjeFR2iEdfWtc6b2Styy8wgmqrK_JsD0sM2E0tyyQMuphfR_d2auboM2">
+</div>
+<span class="block font-label-sm text-[10px] font-bold text-on-surface truncate">04 Sunset Outro</span>
+<span class="text-[9px] font-label-sm text-on-surface-variant">0:12-0:16</span>
+</div>
+</div>
+</div>
+</div>
+<!-- DASHED VOYAGE TRAIL TO THE TREASURE -->
+<div class="flex flex-col items-center justify-center my-6 py-2">
+<div class="flex items-center gap-2 text-primary font-label-sm text-xs font-bold tracking-widest uppercase">
+<span class="material-symbols-outlined text-base">military_tech</span>
+<span class="">You have reached the destination: X MARKS THE SPOT!</span>
+<span class="material-symbols-outlined text-base">south</span>
+</div>
+<div class="h-10 w-0.5 border-l-2 border-dashed border-primary my-1"></div>
+</div>
+</section>
+<!-- ==================================================== -->
+<!-- THE TREASURE: REEL DESTINATION & GENERATION -->
+<!-- ==================================================== -->
+<section class="relative scroll-mt-28" id="milestone-treasure">
+<!-- Giant X Marks the Spot Landmark Header -->
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-primary text-on-primary border-2 border-on-surface flex items-center justify-center font-display-lg text-2xl font-black tactile-shadow rotate-[-4deg]">
+              X
+            </div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-display-lg text-2xl md:text-3xl text-on-surface tracking-tight">The Treasure: Reel Destination</h2>
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-xs px-2.5 py-0.5 rounded font-bold border border-on-surface rotate-2">Final Vault Chest</span>
+</div>
+<p class="font-label-sm text-xs text-on-surface-variant">Your voiceover, clips, and narrative beats are synthesized here into a high-retention reel.</p>
+</div>
+</div>
+</div>
+<!-- The Chest Workbench: Phone Mockup + Synthesis Controls -->
+<div class="bg-[#f7efe5] rounded-xl border-3 border-on-surface treasure-shadow p-6 md:p-8 relative">
+<!-- Tape and stamp badges -->
+<div class="absolute -top-3.5 left-16 w-32 h-6 bg-secondary-fixed -rotate-2 z-20 border border-outline/30 flex items-center justify-center text-[10px] font-label-sm uppercase font-bold text-on-secondary-fixed">
+            ★ READY FOR SYNTHESIS
+          </div>
+<div class="absolute -top-4 right-16 border-2 border-primary text-primary px-3 py-1 rounded text-xs font-label-sm font-bold uppercase rotate-6 bg-surface-container-lowest tactile-shadow-sm">
+            GOLD PASS CHEST
+          </div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+<!-- LEFT: 9:16 Vertical Phone Reel Mockup -->
+<div class="lg:col-span-5 flex justify-center">
+<div class="relative w-full max-w-[300px] bg-surface-container-lowest rounded-2xl border-3 border-on-surface tactile-shadow-lg p-3 pb-6 rotate-[-1deg] hover:rotate-0 transition-transform">
+<!-- Pushpin top -->
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-error border-2 border-on-surface tactile-shadow-sm z-30 flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-surface-container-lowest"></div>
+</div>
+<!-- 9:16 Screen Frame -->
+<div class="relative aspect-[9/16] w-full bg-on-surface rounded-xl overflow-hidden border-2 border-on-surface shadow-inner group">
+<img class="w-full h-full object-cover" data-alt="Vertical preview of Tokyo rainy coffeehouse" id="preview-video-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAsBZlttLZFTTK08jMemdhNgHYesg__gJZ5GdPjojrwxuOznHfmyk5fb11zxPLCKKhdojoubPThzzv7zEXBssmvH-eZIPiAagNwxdCgilcvK_KLcE5QekKDVl66KGG_slB7JKxKBZY0Ui5OeiM_wF-hq84udYQcoEpVYeel1RoezoxEUjMjscRxnZHHLP0WQaEnnSPOG8khF8x4Fz0vDh_teyvn0Nkt7BMpT40wdV0NI1lbeBSNCnj">
+<!-- Overlaid Live Subtitles in Cut-Out Tape Style -->
+<div class="absolute inset-x-3 bottom-14 flex flex-col items-center gap-1.5 text-center pointer-events-none z-20">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-2.5 py-0.5 rounded font-display-md text-xs md:text-sm font-extrabold uppercase tracking-tight -rotate-1 border border-on-surface tactile-shadow-sm">
+                      It was a rainy Tuesday
+                    </span>
+<span class="bg-surface-container-lowest text-on-surface px-2.5 py-0.5 rounded font-display-md text-xs md:text-sm font-extrabold uppercase tracking-tight rotate-1 border border-on-surface tactile-shadow-sm">
+                      in Tokyo alleyway...
+                    </span>
+</div>
+<!-- HUD Top Header -->
+<div class="absolute top-2 left-2 right-2 flex items-center justify-between z-20 text-[10px] font-label-sm">
+<div class="bg-on-surface/80 backdrop-blur-xs text-surface px-2 py-0.5 rounded font-bold flex items-center gap-1">
+<span class="inline-block w-2 h-2 rounded-full bg-error animate-pulse"></span>
+                      REC ● 00:04 / 00:16
+                    </div>
+<div class="bg-secondary-container text-on-secondary-container font-bold px-2 py-0.5 rounded border border-on-surface">
+                      9:16 REEL
+                    </div>
+</div>
+<!-- Waveform overlay -->
+<div class="absolute inset-x-2 bottom-8 h-4 flex items-end justify-center gap-0.5 z-20 opacity-85 pointer-events-none">
+<div class="w-1 bg-surface rounded h-2"></div>
+<div class="w-1 bg-secondary-fixed rounded h-4"></div>
+<div class="w-1 bg-primary-container rounded h-3"></div>
+<div class="w-1 bg-secondary-fixed rounded h-4"></div>
+<div class="w-1 bg-surface rounded h-2"></div>
+<div class="w-1 bg-primary-container rounded h-4"></div>
+<div class="w-1 bg-secondary-fixed rounded h-2"></div>
+</div>
+<!-- Playback scrubber bar -->
+<div class="absolute inset-x-0 bottom-0 bg-on-surface/90 p-2 flex items-center justify-between text-surface z-20">
+<button class="hover:text-primary-container transition-colors flex items-center" id="reel-play-toggle" type="button">
+<span class="material-symbols-outlined text-lg">pause_circle</span>
+</button>
+<div class="flex-1 mx-2 bg-outline/40 h-1.5 rounded overflow-hidden">
+<div class="bg-primary-container h-full w-1/4 rounded"></div>
+</div>
+<span class="font-label-sm text-[9px]">0:04</span>
+</div>
+</div>
+<!-- Polaroid Bottom metadata stamp -->
+<div class="mt-2.5 flex items-center justify-between px-1">
+<div>
+<div class="font-headline-md text-xs font-bold text-on-surface tracking-tight truncate max-w-[170px]">"Rainy Tokyo Cafe" #01</div>
+<div class="font-label-sm text-[9px] text-on-surface-variant">Oliver Voice • Rain &amp; Vinyl OST</div>
+</div>
+<div class="border border-primary text-primary px-1.5 py-0.2 rounded text-[8px] font-label-sm font-bold uppercase rotate-6">
+                    4K READY
+                  </div>
+</div>
+</div>
+</div>
+<!-- RIGHT: Caption Styling & Big Synthesis Red Action Deck -->
+<div class="lg:col-span-7 flex flex-col gap-5">
+<!-- Caption Lettering Customizer -->
+<div class="bg-surface-container-lowest rounded-lg border-2 border-on-surface p-4 tactile-shadow-sm">
+<label class="font-label-sm text-xs font-bold uppercase text-on-surface block mb-2 flex items-center justify-between">
+<span class="">Subtitle Lettering Sticker Style</span>
+<span class="text-primary font-label-sm">High-Retention Captions</span>
+</label>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+<button class="bg-secondary-container text-on-secondary-container border-2 border-on-surface py-2 px-1.5 rounded font-label-sm text-xs font-bold tactile-shadow-sm text-center" type="button">
+                    🏷️ Cut Paper
+                  </button>
+<button class="bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-on-surface py-2 px-1.5 rounded font-label-sm text-xs text-center" type="button">
+                    🖊️ Marker Pop
+                  </button>
+<button class="bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-on-surface py-2 px-1.5 rounded font-label-sm text-xs text-center" type="button">
+                    ⌨️ Typewriter
+                  </button>
+<button class="bg-surface-container-lowest text-on-surface border border-outline-variant hover:border-on-surface py-2 px-1.5 rounded font-label-sm text-xs text-center" type="button">
+                    ✨ Neon Tape
+                  </button>
+</div>
+</div>
+<!-- Destination Actions Box -->
+<div class="bg-surface-container-lowest rounded-lg border-2 border-on-surface p-5 tactile-shadow-sm">
+<!-- Big Primary Red Stamp Button -->
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container py-4 px-6 rounded-lg font-headline-lg text-lg md:text-xl text-center tactile-shadow border-2 border-on-surface transition-all active:translate-x-1 active:translate-y-1 flex items-center justify-center gap-3" id="btn-generate-reel" type="button"><span class="font-extrabold uppercase tracking-wide">Generate Your Video Now</span></button>
+<!-- Immediate Secondary actions -->
+<div class="grid grid-cols-2 gap-3 mt-3">
+<button class="bg-surface-container-high hover:bg-surface-container-highest text-on-surface border-2 border-on-surface py-2.5 px-3 rounded tactile-shadow-sm font-label-md text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 active:translate-x-0.5 active:translate-y-0.5" type="button">
+<span class="material-symbols-outlined text-base">download</span>
+<span class="">Download MP4</span>
+</button>
+<button class="bg-secondary-container hover:bg-secondary-fixed text-on-secondary-container border-2 border-on-surface py-2.5 px-3 rounded tactile-shadow-sm font-label-md text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 active:translate-x-0.5 active:translate-y-0.5" type="button">
+<span class="material-symbols-outlined text-base">share</span>
+<span class="">Publish Reel</span>
+</button>
+</div>
+<!-- Guarantee & Specs Info -->
+<div class="mt-4 pt-3 border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between text-[11px] font-label-sm text-on-surface-variant gap-2">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-primary">verified</span> Uses 1 Reel Credit (23 remaining)
+                  </span>
+<span class="">1080x1920 60FPS • AAC 320kbps</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- SCRAPBOOK FOOTER -->
+<footer class="w-full bg-surface-container-low border-t-2 border-dashed border-outline-variant py-space-sm mt-space-xl">
+<div class="max-w-6xl mx-auto px-4 md:px-margin flex flex-col md:flex-row items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="">Dolge Reel Cartography v3.0</span>
+<span class="text-outline-variant">•</span>
+<span class="">Treasure Trail Active</span>
+<span class="text-outline-variant">•</span>
+<span class="">Autosaved Just Now</span>
+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">© Dolge Creator Studio. Cut &amp; Crafted with Paper AI.</div>
+</div>
+</footer>
+<script>
+  // Tone modifier injection
+  function injectModifier(tone) {
+    const textarea = document.getElementById('story-textarea');
+    if (!textarea) return;
+    const additions = {
+      'Cinematic': '\n[Scene: Cinematic slow dolly into the rain-soaked neon street, deep bass hum]',
+      'Suspense': '\n[Hook: But what was hidden under the cafe floorboards changed everything...]',
+      'Gen-Z': '\n[Fast pacing: POV you accidentally find Tokyo’s best kept secret audio den]',
+      'Humor': '\n[Twist: Turned out the barista was also an 80-year-old retired funk DJ]'
+    };
+    if (additions[tone]) {
+      textarea.value += additions[tone];
+      textarea.scrollTop = textarea.scrollHeight;
+    }
+  }
+
+  // Voice Card selection & Gender Filtering
+  document.querySelectorAll('.voice-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.voice-card').forEach(c => {
+        c.classList.remove('active', 'bg-secondary-fixed/30');
+        c.classList.add('bg-surface-container-lowest');
+        const check = c.querySelector('.voice-check');
+        if (check) check.classList.add('hidden');
+      });
+      card.classList.add('active', 'bg-secondary-fixed/30');
+      card.classList.remove('bg-surface-container-lowest');
+      const check = card.querySelector('.voice-check');
+      if (check) check.classList.remove('hidden');
+    });
+  });
+
+  function filterGender(gender, btn) {
+    document.querySelectorAll('.gender-tag').forEach(t => {
+      t.classList.remove('bg-surface-container-lowest', 'border-2', 'border-on-surface', 'font-bold', 'tactile-shadow-sm', 'text-on-surface');
+      t.classList.add('bg-transparent', 'text-on-surface-variant');
+    });
+    btn.classList.add('bg-surface-container-lowest', 'border-2', 'border-on-surface', 'font-bold', 'tactile-shadow-sm', 'text-on-surface');
+    btn.classList.remove('bg-transparent', 'text-on-surface-variant');
+
+    document.querySelectorAll('.voice-card').forEach(card => {
+      if (gender === 'all' || card.getAttribute('data-gender') === gender) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // Audio atmosphere selector pills
+  document.querySelectorAll('.audio-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.audio-pill').forEach(b => {
+        b.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+        b.classList.add('bg-surface-container-lowest', 'text-on-surface');
+      });
+      btn.classList.add('bg-secondary-container', 'text-on-secondary-container');
+      btn.classList.remove('bg-surface-container-lowest', 'text-on-surface');
+    });
+  });
+
+  // Prompt Spark micro-interaction
+  const sparkPrompts = [
+    "Underneath the 1980s neon bridge in Seoul, a tiny dumpling shop only opens at 2 AM...",
+    "Why this abandoned library in Portugal still has candles lit every evening without electricity...",
+    "Three rules to finding the freshest street matcha in Kyoto before the morning crowds wake up...",
+    "I took a sleeper train across Scotland and discovered a handwritten notebook between the seat cushions..."
+  ];
+
+  const sparkBtn = document.getElementById('btn-spark');
+  if (sparkBtn) {
+    sparkBtn.addEventListener('click', () => {
+      const textarea = document.getElementById('story-textarea');
+      const randomPrompt = sparkPrompts[Math.floor(Math.random() * sparkPrompts.length)];
+      textarea.value = randomPrompt;
+      sparkBtn.classList.add('scale-105');
+      setTimeout(() => sparkBtn.classList.remove('scale-105'), 200);
+    });
+  }
+
+  // Audition voiceover toggle
+  const auditionBtn = document.getElementById('btn-preview-voice');
+  if (auditionBtn) {
+    auditionBtn.addEventListener('click', () => {
+      const origHtml = auditionBtn.innerHTML;
+      auditionBtn.innerHTML = '<span class="material-symbols-outlined text-primary animate-spin text-xl">progress_activity</span> <span class="font-bold">Playing Audio Track...</span>';
+      setTimeout(() => {
+        auditionBtn.innerHTML = origHtml;
+      }, 2500);
+    });
+  }
+
+  // Play button toggle on preview HUD
+  const playToggle = document.getElementById('reel-play-toggle');
+  let isPlaying = true;
+  if (playToggle) {
+    playToggle.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      playToggle.innerHTML = isPlaying 
+        ? '<span class="material-symbols-outlined text-lg">pause_circle</span>'
+        : '<span class="material-symbols-outlined text-lg">play_circle</span>';
+    });
+  }
+
+  // Generate Reel button simulation
+  const genBtn = document.getElementById('btn-generate-reel');
+  if (genBtn) {
+    genBtn.addEventListener('click', () => {
+      const originalContent = genBtn.innerHTML;
+      genBtn.innerHTML = '<span class="material-symbols-outlined text-2xl animate-spin">refresh</span> <span class="font-extrabold uppercase">Synthesizing Audio & Video Stamps...</span>';
+      genBtn.disabled = true;
+      setTimeout(() => {
+        genBtn.innerHTML = '<span class="material-symbols-outlined text-2xl">check_circle</span> <span class="font-extrabold uppercase">Reel Crafted Successfully!</span>';
+        setTimeout(() => {
+          genBtn.innerHTML = originalContent;
+          genBtn.disabled = false;
+        }, 2200);
+      }, 2200);
+    });
+  }
+</script>
+
+
+</body></html>

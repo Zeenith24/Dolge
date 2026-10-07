@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dolge – Reel Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;800&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>*, body, h1, h2, h3, h4, h5, h6, p, span, button, input, textarea, a, label, select { font-family: 'Courier Prime', monospace !important; } .material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; }
+.cap-cut{background:#f9e287;color:#1e1b19;border:2px solid #1e1b19;box-shadow:3px 3px 0 #1e1b19;text-transform:uppercase}
+.cap-marker{color:#ffdd00;text-transform:uppercase;-webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:0 2px 0 #000}
+.cap-type{background:rgba(15,15,15,.85);color:#fff}
+.cap-neon{color:#eaffff;text-shadow:0 0 6px #00e5ff,0 0 14px #00e5ff,0 0 24px #00e5ff}
+</style>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="/static/tailwind-config.js"></script>
+</head>
+<body class="bg-background text-on-surface parchment-grid min-h-screen relative selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+
+<!-- TOP HEADER -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-low/95 backdrop-blur-sm border-b-2 border-dashed border-outline-variant shadow-sm">
+  <div class="h-20 w-full px-4 md:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="relative -rotate-2 select-none">
+        <div class="absolute -top-2.5 left-2 w-10 h-4 bg-secondary-fixed/90 -rotate-6 z-20 pointer-events-none border border-outline/30"></div>
+        <div class="bg-surface-container-lowest px-3 py-1 rounded tactile-shadow border-2 border-on-surface">
+          <div class="text-xl font-bold leading-none tracking-tight" style="font-family:'Bricolage Grotesque' !important">Dolge</div>
+          <div class="text-[9px] uppercase tracking-widest text-primary font-bold">Cartography Desk</div>
+        </div>
+      </div>
+      <div class="hidden lg:flex items-center gap-2 bg-surface-container-highest/80 border border-outline rounded-full px-3 py-1">
+        <span class="material-symbols-outlined text-primary text-base">explore</span>
+        <span class="text-[11px] font-bold uppercase text-on-surface-variant tracking-wider">Story Voyage Trail</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 md:gap-4">
+      <div class="bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded text-xs font-bold border-2 border-secondary tactile-shadow-sm rotate-1 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm leading-none">confirmation_number</span><span id="credits">– Credits</span>
+      </div>
+      <a href="#milestone-treasure" class="bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary transition-all text-xs uppercase tracking-wider px-3.5 py-1.5 rounded tactile-shadow font-bold border-2 border-on-surface active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1">
+        <span class="material-symbols-outlined text-sm">flag</span><span class="hidden sm:inline">Create Your video</span><span class="sm:hidden">Create</span>
+      </a>
+      <a href="#archive" class="hidden md:flex items-center gap-1 text-xs font-bold uppercase text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-base">video_library</span>My reels</a>
+      <div class="flex items-center gap-2">
+        <div class="bg-surface-container-lowest p-1 rounded-sm border-2 border-on-surface tactile-shadow-sm flex flex-col items-center rotate-2">
+          <div id="avatar" class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xs font-bold">?</div>
+          <span id="user-name" class="text-[8px] text-on-surface-variant font-bold leading-none mt-0.5 max-w-[56px] truncate">PILOT</span>
+        </div>
+        <button id="btn-logout" type="button" title="Log out" class="material-symbols-outlined text-on-surface-variant hover:text-primary">logout</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="w-full pt-24 pb-20">
+<div class="max-w-6xl mx-auto px-4 md:px-6">
+
+  <!-- MAP BANNER -->
+  <div class="relative bg-[#fcf6ea] border-2 border-on-surface rounded-xl p-5 md:p-6 mb-10 tactile-shadow-lg overflow-hidden">
+    <div class="absolute -top-3 left-10 w-28 h-6 bg-secondary-fixed/90 -rotate-2 z-10 border border-outline/30"></div>
+    <div class="absolute -top-3 right-12 w-28 h-6 bg-tertiary-fixed/85 rotate-3 z-10 border border-outline/30"></div>
+    <div class="border-b-2 border-dashed border-outline-variant pb-4">
+      <span class="bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded text-[11px] font-bold uppercase border border-on-surface -rotate-1 inline-block mb-1">📜 Creator's Expedition Map</span>
+      <h1 class="text-2xl md:text-3xl lg:text-4xl tracking-tight leading-tight font-extrabold" style="font-family:'Bricolage Grotesque' !important">Follow the Trail to Craft Your Viral Reel</h1>
+      <p class="text-on-surface-variant text-sm mt-1 max-w-2xl">Write your tale, pick a human-sounding narrator, choose gameplay or cooking footage, and we'll stitch a captioned vertical reel.</p>
+    </div>
+    <div class="mt-5">
+      <div class="text-xs font-bold uppercase text-on-surface-variant mb-3 flex items-center gap-1.5"><span class="material-symbols-outlined text-sm text-primary">route</span> Quest Trail Progression:</div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <a href="#milestone-1" class="bg-secondary-fixed/40 hover:bg-secondary-fixed/70 border-2 border-on-surface rounded-lg p-2.5 tactile-shadow-sm flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-secondary-container border-2 border-on-surface text-xs flex items-center justify-center shrink-0 font-bold">1</div>
+          <div class="overflow-hidden"><span class="block text-[10px] font-bold text-primary uppercase">Stop One</span><span class="text-xs font-bold block truncate">Story Haven</span><span class="text-[10px] text-on-surface-variant">Script &amp; Narrative</span></div>
+        </a>
+        <a href="#milestone-2" class="bg-surface-container-lowest hover:bg-surface-container-low border-2 border-on-surface rounded-lg p-2.5 tactile-shadow-sm flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-surface-container-high border-2 border-on-surface text-xs flex items-center justify-center shrink-0 font-bold">2</div>
+          <div class="overflow-hidden"><span class="block text-[10px] font-bold text-on-surface-variant uppercase">Stop Two</span><span class="text-xs font-bold block truncate">Voice Lab Cave</span><span class="text-[10px] text-on-surface-variant">Narrator &amp; Audio</span></div>
+        </a>
+        <a href="#milestone-3" class="bg-surface-container-lowest hover:bg-surface-container-low border-2 border-on-surface rounded-lg p-2.5 tactile-shadow-sm flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-surface-container-high border-2 border-on-surface text-xs flex items-center justify-center shrink-0 font-bold">3</div>
+          <div class="overflow-hidden"><span class="block text-[10px] font-bold text-on-surface-variant uppercase">Stop Three</span><span class="text-xs font-bold block truncate">Video Island</span><span class="text-[10px] text-on-surface-variant">Footage &amp; Uploads</span></div>
+        </a>
+        <a href="#milestone-treasure" class="bg-primary-fixed/60 hover:bg-primary-fixed border-2 border-on-surface rounded-lg p-2.5 tactile-shadow-sm flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-primary text-on-primary border-2 border-on-surface text-xs flex items-center justify-center shrink-0 font-bold">X</div>
+          <div class="overflow-hidden"><span class="block text-[10px] font-bold text-primary uppercase">Treasure</span><span class="text-xs font-bold block truncate">Reel Destination</span><span class="text-[10px] text-on-surface-variant">Generate &amp; Download</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative space-y-12">
+
+    <!-- MILESTONE 1 -->
+    <section class="relative scroll-mt-28" id="milestone-1">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-9 h-9 rounded-full bg-secondary-container border-2 border-on-surface flex items-center justify-center text-base font-bold tactile-shadow-sm">1</div>
+        <h2 class="text-xl md:text-2xl tracking-tight font-bold" style="font-family:'Bricolage Grotesque' !important">Milestone 1: Story Haven</h2>
+        <span class="hidden sm:inline bg-surface-container-high text-on-surface-variant text-[10px] px-2 py-0.5 rounded border border-outline/50 uppercase">Script Manuscript</span>
+      </div>
+      <div class="relative bg-[#fffdf0] rounded-xl border-2 border-on-surface tactile-shadow-lg p-5 md:p-7">
+        <div class="absolute -top-3 left-8 w-6 h-6 rounded-full bg-error border-2 border-on-surface tactile-shadow-sm flex items-center justify-center z-20"><div class="w-2 h-2 rounded-full bg-surface-container-lowest"></div></div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b-2 border-dashed border-outline-variant/60 pb-3 mb-4">
+          <div>
+            <span class="text-xs uppercase font-bold tracking-widest text-on-surface-variant flex items-center gap-1.5"><span class="material-symbols-outlined text-sm text-primary">history_edu</span> Tell Your Tale or Paste Your Script</span>
+            <p class="text-[11px] text-outline mt-0.5">Reddit-style stories, confessions, mini-mysteries — anything you want narrated.</p>
+          </div>
+          <button id="btn-spark" type="button" class="self-start md:self-auto bg-surface-container-highest hover:bg-secondary-fixed text-xs px-3 py-1.5 rounded border-2 border-on-surface tactile-shadow-sm active:scale-95 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-secondary">casino</span>Spark Random Story
+          </button>
+        </div>
+        <div class="mb-3">
+          <label for="title" class="text-[11px] uppercase font-bold text-on-surface-variant">Reel title</label>
+          <input id="title" maxlength="120" value="My first reel" class="w-full mt-1 rounded border-2 border-on-surface bg-surface-container-lowest text-sm">
+        </div>
+        <div class="relative pl-6 pr-2 bg-[linear-gradient(transparent_27px,#e3dac9_28px)] bg-[length:100%_28px] rounded">
+          <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-error/40 pointer-events-none"></div>
+          <textarea id="story" rows="8" maxlength="4000" class="w-full bg-transparent border-0 resize-y text-sm md:text-base leading-[28px] focus:outline-none focus:ring-0 p-0 placeholder:text-on-surface-variant/50" placeholder="Tell your tale or paste your script…">It was a rainy Tuesday in Tokyo when I accidentally discovered this hidden vinyl jazz cafe down an alleyway. The coffee tasted like roasted hazelnuts and old memories. Rain tapped the window as Duke Ellington spun softly on a 1968 turntable.</textarea>
+        </div>
+        <div class="mt-5 pt-3 border-t border-outline-variant/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs uppercase font-bold text-on-surface-variant">✨ Tone Stamps:</span>
+            <button type="button" data-tone="cinematic" class="tone bg-secondary-fixed/90 hover:bg-secondary-fixed text-on-secondary-fixed text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm -rotate-1 active:scale-95">🎬 Cinematic</button>
+            <button type="button" data-tone="suspense" class="tone bg-primary-fixed hover:bg-primary-fixed-dim text-on-primary-fixed text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm rotate-2 active:scale-95">⚡ Mystery / Hook</button>
+            <button type="button" data-tone="upbeat" class="tone bg-tertiary-fixed hover:bg-tertiary-fixed-dim text-on-tertiary-fixed text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm -rotate-2 active:scale-95">🔥 Upbeat Paced</button>
+            <button type="button" data-tone="cozy" class="tone bg-surface-container-highest hover:bg-surface-container-high text-xs px-2.5 py-1 rounded-sm border border-on-surface tactile-shadow-sm rotate-1 active:scale-95">☕ Nostalgic Cozy</button>
+          </div>
+          <div id="duration-est" class="text-[11px] text-on-surface-variant sm:text-right"></div>
+        </div>
+      </div>
+      <div class="flex flex-col items-center my-6 py-2 text-primary text-xs font-bold tracking-widest uppercase">
+        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-base">footprint</span>Follow the ink trail down the slope…<span class="material-symbols-outlined text-base">south</span></div>
+        <div class="h-10 w-0.5 border-l-2 border-dashed border-primary my-1"></div>
+      </div>
+    </section>
+
+    <!-- MILESTONE 2 -->
+    <section class="relative scroll-mt-28" id="milestone-2">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-9 h-9 rounded-full bg-tertiary-fixed border-2 border-on-surface flex items-center justify-center text-base font-bold tactile-shadow-sm">2</div>
+        <h2 class="text-xl md:text-2xl tracking-tight font-bold" style="font-family:'Bricolage Grotesque' !important">Milestone 2: Voice Lab Cave</h2>
+        <span class="hidden sm:inline bg-primary-container text-on-primary-container text-[10px] px-2 py-0.5 rounded font-bold border border-on-surface">NEURAL AUDIO FORGE</span>
+      </div>
+      <div class="bg-surface-container-low rounded-xl border-2 border-on-surface tactile-shadow-lg p-5 md:p-7 relative">
+        <div class="absolute -top-3 right-8 w-24 h-5 bg-tertiary-fixed/80 rotate-3 z-20 pointer-events-none border border-outline/20"></div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-on-surface pb-4 mb-5">
+          <div>
+            <h3 class="text-lg flex items-center gap-2 font-bold"><span class="material-symbols-outlined text-primary">record_voice_over</span> Choose Narrator &amp; Soundtrack</h3>
+            <p class="text-xs text-on-surface-variant">Filter by voice type, then audition before you spend a credit.</p>
+          </div>
+          <div id="gender-filter" class="flex items-center gap-1.5 bg-surface-container-highest/70 p-1 rounded-md border border-outline-variant">
+            <span class="text-[10px] uppercase font-bold text-on-surface-variant px-1.5">Voice:</span>
+            <button data-g="all" type="button" class="gender-tag bg-surface-container-lowest border-2 border-on-surface text-xs font-bold px-2.5 py-0.5 rounded tactile-shadow-sm">All</button>
+            <button data-g="male" type="button" class="gender-tag text-xs px-2.5 py-0.5 rounded text-on-surface-variant">Male</button>
+            <button data-g="female" type="button" class="gender-tag text-xs px-2.5 py-0.5 rounded text-on-surface-variant">Female</button>
+            <button data-g="nonbinary" type="button" class="gender-tag text-xs px-2.5 py-0.5 rounded text-on-surface-variant">Neutral</button>
+          </div>
+        </div>
+        <div id="voice-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-surface-container-highest/60 rounded-lg p-4 border border-outline-variant">
+          <div class="md:col-span-5 grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1 text-on-surface-variant font-bold"><span>VOICE PACE</span><span id="speed-val" class="text-primary">1.05x</span></div>
+              <input id="speed" type="range" min="0.75" max="1.5" step="0.05" value="1.05" class="w-full accent-primary cursor-pointer">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1 text-on-surface-variant font-bold"><span>PITCH</span><span id="pitch-val" class="text-secondary">+0st</span></div>
+              <input id="pitch" type="range" min="-6" max="6" step="1" value="0" class="w-full accent-secondary cursor-pointer">
+            </div>
+          </div>
+          <div class="md:col-span-4">
+            <label class="text-xs font-bold uppercase block mb-1.5">Atmosphere Soundtrack</label>
+            <div id="music-pills" class="grid grid-cols-2 gap-1.5"></div>
+          </div>
+          <div class="md:col-span-3">
+            <button id="btn-preview-voice" type="button" class="w-full bg-surface-container-lowest hover:bg-surface-container-high border-2 border-on-surface rounded-lg p-2.5 text-xs uppercase tracking-wider tactile-shadow-sm flex flex-col items-center gap-1 active:translate-x-0.5 active:translate-y-0.5">
+              <span id="audition-icon" class="material-symbols-outlined text-primary text-xl">play_circle</span>
+              <span id="audition-label" class="font-bold">Audition Voice</span>
+              <span id="audition-sub" class="text-[9px] text-outline">Oliver</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col items-center my-6 py-2 text-primary text-xs font-bold tracking-widest uppercase">
+        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-base">sailing</span>Cross the ink strait to Video Island…<span class="material-symbols-outlined text-base">south</span></div>
+        <div class="h-10 w-0.5 border-l-2 border-dashed border-primary my-1"></div>
+      </div>
+    </section>
+
+    <!-- MILESTONE 3 -->
+    <section class="relative scroll-mt-28" id="milestone-3">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-9 h-9 rounded-full bg-primary-fixed border-2 border-on-surface flex items-center justify-center text-base font-bold tactile-shadow-sm">3</div>
+        <h2 class="text-xl md:text-2xl tracking-tight font-bold" style="font-family:'Bricolage Grotesque' !important">Milestone 3: Video Vault Island</h2>
+        <span class="hidden sm:inline bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded font-bold border border-on-surface">9:16 VERTICAL REELS</span>
+      </div>
+      <div class="bg-surface-container-low rounded-xl border-2 border-on-surface tactile-shadow-lg p-5 md:p-7 relative">
+        <div class="absolute -top-7 left-6 bg-surface-container-low border-t-2 border-x-2 border-on-surface rounded-t-md px-4 py-1 flex items-center gap-2 z-10">
+          <span class="material-symbols-outlined text-sm text-secondary">folder_open</span><span class="text-xs font-bold uppercase tracking-wider">Film Vault &amp; Uploads</span>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6 pt-2">
+          <div class="lg:col-span-4 flex flex-col">
+            <span class="text-xs uppercase font-bold mb-2 flex items-center gap-1.5"><span class="bg-secondary-container w-4 h-4 rounded-full flex items-center justify-center text-[10px]">A</span>Drop / Upload Your Footage</span>
+            <div id="dropzone" class="border-2 border-dashed border-outline rounded-lg p-5 bg-surface-container-lowest/90 text-center hover:bg-surface-container-lowest cursor-pointer flex-1 flex flex-col items-center justify-center tactile-shadow-sm min-h-[180px]">
+              <div class="w-12 h-12 rounded-full bg-surface-container-high border-2 border-on-surface flex items-center justify-center mb-2"><span id="drop-icon" class="material-symbols-outlined text-primary text-2xl">cloud_upload</span></div>
+              <div id="drop-title" class="text-xs font-bold uppercase">Pin Custom Clips</div>
+              <p id="drop-sub" class="text-[11px] text-on-surface-variant mt-1">Drag an MP4/MOV here or click to browse (max 300 MB)</p>
+              <div class="mt-3 bg-surface-container-highest px-2 py-0.5 rounded text-[10px] text-outline border border-outline/40">Auto-cropped to 9:16 vertical</div>
+              <input id="file-input" type="file" accept="video/*" multiple class="hidden">
+            </div>
+          </div>
+          <div class="lg:col-span-8 flex flex-col">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs uppercase font-bold flex items-center gap-1.5"><span class="bg-secondary-container w-4 h-4 rounded-full flex items-center justify-center text-[10px]">B</span>Pick Background Footage (click to pin)</span>
+              <span id="pin-count" class="text-[11px] text-primary font-bold">0 clips pinned</span>
+            </div>
+            <div id="asset-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+          </div>
+        </div>
+        <div class="border-t-2 border-on-surface pt-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs uppercase font-bold flex items-center gap-1.5"><span class="material-symbols-outlined text-sm text-primary">attachment</span><span id="seq-label">Active Sequence Trail</span></span>
+            <span class="text-[10px] text-on-surface-variant">Clips play in this order and loop to fill the story.</span>
+          </div>
+          <div id="sequence" class="flex gap-2 bg-surface-container-highest p-2.5 rounded-lg border-2 border-on-surface overflow-x-auto min-h-[84px]"></div>
+        </div>
+      </div>
+      <div class="flex flex-col items-center my-6 py-2 text-primary text-xs font-bold tracking-widest uppercase">
+        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-base">military_tech</span>X MARKS THE SPOT!<span class="material-symbols-outlined text-base">south</span></div>
+        <div class="h-10 w-0.5 border-l-2 border-dashed border-primary my-1"></div>
+      </div>
+    </section>
+
+    <!-- TREASURE -->
+    <section class="relative scroll-mt-28" id="milestone-treasure">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-primary text-on-primary border-2 border-on-surface flex items-center justify-center text-2xl font-black tactile-shadow -rotate-3">X</div>
+        <div>
+          <h2 class="text-2xl md:text-3xl tracking-tight font-extrabold" style="font-family:'Bricolage Grotesque' !important">The Treasure: Reel Destination</h2>
+          <p class="text-xs text-on-surface-variant">Your voiceover, footage and captions are synthesized into a high-retention reel.</p>
+        </div>
+      </div>
+      <div class="bg-[#f7efe5] rounded-xl border-2 border-on-surface treasure-shadow p-6 md:p-8 relative">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <!-- phone -->
+          <div class="lg:col-span-5 flex justify-center">
+            <div class="relative w-full max-w-[300px] bg-surface-container-lowest rounded-2xl border-2 border-on-surface tactile-shadow-lg p-3 pb-4 -rotate-1 hover:rotate-0 transition-transform">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-error border-2 border-on-surface tactile-shadow-sm z-30 flex items-center justify-center"><div class="w-2 h-2 rounded-full bg-surface-container-lowest"></div></div>
+              <div id="screen" class="relative aspect-[9/16] w-full bg-on-surface rounded-xl overflow-hidden border-2 border-on-surface">
+                <img id="preview-img" class="absolute inset-0 w-full h-full object-cover hidden" alt="">
+                <video id="preview-video" class="absolute inset-0 w-full h-full object-cover hidden" controls playsinline></video>
+                <div id="preview-caption" class="absolute inset-x-3 top-1/2 -translate-y-1/2 flex flex-col items-center text-center pointer-events-none z-10"></div>
+                <div id="progress-overlay" class="absolute inset-0 bg-on-surface/80 z-20 hidden flex-col items-center justify-center text-surface p-6 text-center">
+                  <span class="material-symbols-outlined text-4xl animate-spin text-primary-container">progress_activity</span>
+                  <div id="progress-stage" class="mt-3 text-sm font-bold uppercase">Starting…</div>
+                  <div class="w-full bg-outline/40 h-2 rounded overflow-hidden mt-3"><div id="progress-bar" class="bg-primary-container h-full" style="width:0%"></div></div>
+                  <div id="progress-pct" class="text-xs mt-1">0%</div>
+                </div>
+              </div>
+              <div class="mt-2.5 px-1">
+                <div id="phone-title" class="text-xs font-bold tracking-tight truncate">Preview</div>
+                <div id="phone-sub" class="text-[9px] text-on-surface-variant truncate">Pick footage to see a preview</div>
+              </div>
+            </div>
+          </div>
+          <!-- controls -->
+          <div class="lg:col-span-7 flex flex-col gap-5">
+            <div class="bg-surface-container-lowest rounded-lg border-2 border-on-surface p-4 tactile-shadow-sm">
+              <label class="text-xs font-bold uppercase block mb-2 flex items-center justify-between"><span>Subtitle Lettering Style</span><span class="text-primary">High-Retention Captions</span></label>
+              <div id="caption-styles" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+            </div>
+            <div class="bg-surface-container-lowest rounded-lg border-2 border-on-surface p-5 tactile-shadow-sm">
+              <button id="btn-generate" type="button" class="w-full bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container py-4 px-6 rounded-lg text-lg md:text-xl text-center tactile-shadow border-2 border-on-surface transition-all active:translate-x-1 active:translate-y-1 flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed">
+                <span class="font-extrabold uppercase tracking-wide">Generate Your Video Now</span>
+              </button>
+              <div class="grid grid-cols-2 gap-3 mt-3">
+                <a id="btn-download" href="#" class="btn-disabled bg-surface-container-high hover:bg-surface-container-highest border-2 border-on-surface py-2.5 px-3 rounded tactile-shadow-sm text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                  <span class="material-symbols-outlined text-base">download</span>Download MP4</a>
+                <button id="btn-publish" type="button" class="btn-disabled bg-secondary-container hover:bg-secondary-fixed text-on-secondary-container border-2 border-on-surface py-2.5 px-3 rounded tactile-shadow-sm text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                  <span class="material-symbols-outlined text-base">share</span>Publish Reel</button>
+              </div>
+              <div class="mt-4 pt-3 border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between text-[11px] text-on-surface-variant gap-2">
+                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs text-primary">verified</span><span id="credit-note">Uses 1 reel credit</span></span>
+                <span>1080x1920 30FPS • AAC 192kbps</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHIVE -->
+    <section class="relative scroll-mt-28" id="archive">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-full bg-surface-container-highest border-2 border-on-surface flex items-center justify-center tactile-shadow-sm"><span class="material-symbols-outlined text-base">video_library</span></div>
+        <h2 class="text-xl md:text-2xl tracking-tight font-bold" style="font-family:'Bricolage Grotesque' !important">Your Reel Archive</h2>
+      </div>
+      <div id="archive-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+      <p id="archive-empty" class="hidden text-sm text-on-surface-variant">Nothing here yet — your finished reels will be filed here.</p>
+    </section>
+  </div>
+</div>
+</main>
+
+<footer class="w-full bg-surface-container-low border-t-2 border-dashed border-outline-variant py-2 mt-10">
+  <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-on-surface-variant uppercase tracking-wider">
+    <span class="flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>Dolge Reel Cartography</span>
+    <span class="normal-case">© Dolge Creator Studio.</span>
+  </div>
+</footer>
+
+<audio id="audio-player" class="hidden"></audio>
+<script src="/static/common.js"></script>
+<script src="/static/studio.js"></script>
+</body></html>

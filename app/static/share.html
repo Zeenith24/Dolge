@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dolge – Shared reel</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>*, body, p, span, button, a, div { font-family: 'Courier Prime', monospace !important; }</style>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="/static/tailwind-config.js"></script>
+</head>
+<body class="bg-background text-on-surface parchment-grid min-h-screen flex items-center justify-center p-4">
+<main class="w-full max-w-[340px] text-center">
+  <div class="bg-surface-container-lowest rounded-2xl border-2 border-on-surface tactile-shadow-lg p-3 pb-4">
+    <video id="v" class="w-full aspect-[9/16] bg-on-surface rounded-xl" controls playsinline></video>
+    <div id="title" class="font-bold mt-2 text-sm">Loading…</div>
+    <div id="by" class="text-[11px] text-on-surface-variant"></div>
+  </div>
+  <a href="/login" class="inline-block mt-5 bg-primary text-on-primary px-4 py-2 rounded border-2 border-on-surface tactile-shadow-sm text-xs font-bold uppercase">Make your own reel</a>
+</main>
+<script src="/static/common.js"></script>
+<script>
+(async () => {
+  const token = location.pathname.split('/').pop();
+  try {
+    const info = await api('/api/share/' + token);
+    document.getElementById('title').textContent = info.title;
+    document.getElementById('by').textContent = 'by ' + info.by + ' · ' + fmtTime(info.duration);
+    document.getElementById('v').src = '/api/share/' + token + '/file';
+  } catch (e) { document.getElementById('title').textContent = 'This reel isn’t available.'; }
+})();
+</script>
+</body></html>
