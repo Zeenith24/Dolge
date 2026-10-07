@@ -143,7 +143,7 @@ def _wrap(draw, text, font, max_width, stroke=0):
     return lines
 
 
-def render_caption(text, style, size=(S.OUT_W, S.OUT_H)):
+def render_caption(text, style, size=(S.CAP_W, S.CAP_H)):
     """One caption as a transparent RGBA frame (numpy array)."""
     W, H = size
     canvas = Image.new("RGBA", size, (0, 0, 0, 0))
@@ -300,7 +300,10 @@ def _write_caption_sequence(chunks, duration, style, cap_dir):
         if start > t + 0.01:
             entries.append((blank, start - t))
         png = os.path.join(cap_dir, f"{n:03d}.png")
-        Image.fromarray(render_caption(chunk_text, style)).save(png)
+        img = Image.fromarray(render_caption(chunk_text, style))
+        if (W, H) != img.size:
+            img = img.resize((W, H), Image.LANCZOS)
+        img.save(png)
         entries.append((png, end - max(start, t)))
         t = end
     if t < duration - 0.01:
