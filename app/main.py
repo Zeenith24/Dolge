@@ -22,7 +22,9 @@ from sqlalchemy.orm import Session
 from . import auth, engine, settings as S
 from .db import Asset, SessionLocal, User, Video, get_db, init_db, new_id
 
-executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="render")
+# One render at a time by default (each uses a few hundred MB); raise on bigger servers.
+executor = ThreadPoolExecutor(max_workers=int(os.environ.get("RENDER_WORKERS", "1")),
+                              thread_name_prefix="render")
 _credit_lock = threading.Lock()
 
 

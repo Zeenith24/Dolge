@@ -1,8 +1,8 @@
 """
 Video rendering engine used by the web app.
 
-Pipeline: Edge TTS (with word timings) -> background clips (cover-cropped to 9:16)
--> transparent caption clips synced to the spoken words -> optional music -> mp4.
+Pipeline: Edge TTS (with word timings) -> caption PNGs synced to the spoken words
+-> one ffmpeg run that crops the footage to 9:16, overlays captions, mixes audio -> mp4.
 """
 import asyncio
 import os
@@ -13,9 +13,6 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 import edge_tts
 import imageio_ffmpeg
-from moviepy import (AudioFileClip, CompositeAudioClip, CompositeVideoClip, ImageClip,
-                     VideoFileClip, afx, concatenate_videoclips, vfx)
-from proglog import ProgressBarLogger
 
 from . import settings as S
 
@@ -220,56 +217,104 @@ def render_caption(text, style, size=(S.OUT_W, S.OUT_H)):
     return np.array(canvas)
 
 
-# --------------------------------------------------------------------------- background
-def _cover(clip, W, H):
-    """Scale + center-crop to fill WxH without distortion."""
-    scale = max(W / clip.w, H / clip.h)
-    clip = clip.resized(scale)
-    x1 = (clip.w - W) / 2
-    y1 = (clip.h - H) / 2
-    return clip.cropped(x1=x1, y1=y1, x2=x1 + W, y2=y1 + H)
+# --------------------------------------------------------------------------- render (pure ffmpeg)
+#
+# Frames are streamed through one ffmpeg process instead of being held in Python memory,
+# so a render needs a few hundred MB at most (moviepy needed several times that).
 
-
-def build_background(paths, duration, W, H):
-    """Cycle through the chosen clips (in order) until `duration` is covered."""
-    sources = []
-    for p in paths:
-        try:
-            c = VideoFileClip(p, audio=False)
-            if c.duration and c.duration > 0:
-                sources.append(c)
-        except Exception as exc:  # unreadable file: skip it
-            print(f"skipping unreadable clip {p}: {exc}")
-    if not sources:
+def _plan_segments(paths, duration):
+    """Cycle through the clips in order until `duration` is covered -> [(path, seconds)]."""
+    usable = [(p, d) for p in paths if (d := probe_duration(p)) > 0.1]
+    if not usable:
         raise RuntimeError("None of the selected background clips could be read.")
-
-    parts, total, i = [], 0.0, 0
-    while total < duration:
-        src = sources[i % len(sources)]
-        take = min(src.duration, duration - total)
-        if take < 0.05:
-            break
-        parts.append(_cover(src.subclipped(0, take), W, H))
+    segs, total, i = [], 0.0, 0
+    while total < duration - 0.01:
+        path, dur = usable[i % len(usable)]
+        take = min(dur, duration - total)
+        segs.append((path, take))
         total += take
         i += 1
-    bg = parts[0] if len(parts) == 1 else concatenate_videoclips(parts)
-    return bg.with_duration(duration), sources
+        if len(segs) > 400:
+            break
+    return segs
 
 
-# --------------------------------------------------------------------------- render
-class _Progress(ProgressBarLogger):
-    def __init__(self, cb, lo, hi):
-        super().__init__()
-        self.cb, self.lo, self.hi = cb, lo, hi
+def _normalize_clip(src, dst, seconds):
+    """Re-encode one clip to 1080x1920 / 30fps H.264 (fast, single thread) so clips can be joined."""
+    W, H, FPS = S.OUT_W, S.OUT_H, S.OUT_FPS
+    cmd = [FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-nostdin", "-threads", "1",
+           "-t", f"{seconds:.3f}", "-i", src, "-an",
+           "-vf", f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1,fps={FPS},format=yuv420p",
+           "-c:v", "libx264", "-preset", "ultrafast", "-crf", "20", "-threads", "1",
+           "-x264-params", "rc-lookahead=0:sync-lookahead=0:bframes=0:threads=1", dst]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0 or not os.path.exists(dst):
+        raise RuntimeError(f"Could not prepare clip {os.path.basename(src)}: {proc.stderr.strip()[-200:]}")
 
-    def bars_callback(self, bar, attr, value, old_value=None):
-        if bar == "frame_index" and attr == "index":
-            total = self.bars[bar].get("total") or 0
-            if total:
-                self.cb(self.lo + (self.hi - self.lo) * value / total, "Rendering video")
 
-    def callback(self, **kw):
-        pass
+def _write_background_list(segments, duration, workdir, job_id, bg_files, progress):
+    """
+    ffmpeg concat list for the background: the chosen clips cycled until `duration` is covered.
+    With several different clips, each is normalized first so they share one codec/size
+    (the concat demuxer needs that, and it avoids ffmpeg buffering several decoders at once).
+    """
+    distinct = list(dict.fromkeys(p for p, _ in segments))
+    source = {p: p for p in distinct}
+    if len(distinct) > 1:
+        for n, p in enumerate(distinct):
+            dst = os.path.join(workdir, f"{job_id}_bg{n}.mp4")
+            bg_files.append(dst)
+            need = max(t for q, t in segments if q == p)
+            _normalize_clip(p, dst, need)
+            source[p] = dst
+            progress(15 + 25 * (n + 1) / len(distinct), "Preparing footage")
+
+    lines = []
+    for path, take in segments:
+        posix = source[path].replace(os.sep, "/")
+        lines.append(f"file '{posix}'")
+        full = probe_duration(source[path])
+        if take < full - 0.05:
+            lines.append(f"outpoint {take:.3f}")
+    list_path = os.path.join(workdir, f"{job_id}_bg.txt")
+    with open(list_path, "w") as fh:
+        fh.write("\n".join(lines) + "\n")
+    return list_path
+
+
+def _write_caption_sequence(chunks, duration, style, cap_dir):
+    """
+    Save each caption as a full-canvas transparent PNG and write an ffmpeg concat list that
+    shows them back to back (blank PNG in any gaps). Streaming one image sequence keeps
+    ffmpeg's memory flat no matter how many captions there are.
+    """
+    W, H = S.OUT_W, S.OUT_H
+    blank = os.path.join(cap_dir, "blank.png")
+    Image.new("RGBA", (W, H), (0, 0, 0, 0)).save(blank)
+
+    entries, t = [], 0.0          # (png, seconds)
+    for n, (start, end, chunk_text) in enumerate(chunks):
+        if start >= duration:
+            break
+        end = min(end, duration)
+        if start > t + 0.01:
+            entries.append((blank, start - t))
+        png = os.path.join(cap_dir, f"{n:03d}.png")
+        Image.fromarray(render_caption(chunk_text, style)).save(png)
+        entries.append((png, end - max(start, t)))
+        t = end
+    if t < duration - 0.01:
+        entries.append((blank, duration - t))
+    if not entries:
+        entries.append((blank, duration))
+
+    list_path = os.path.join(cap_dir, "list.txt")
+    with open(list_path, "w") as f:
+        for png, secs in entries:
+            posix = png.replace(os.sep, "/")
+            f.write(f"file '{posix}'\nduration {max(secs, 0.04):.3f}\n")
+        f.write("file '{}'\n".format(entries[-1][0].replace(os.sep, "/")))  # concat quirk: repeat last file
+    return list_path
 
 
 def render_video(*, text, out_path, voice_edge, speed, pitch, clip_paths, caption_style,
@@ -285,60 +330,90 @@ def render_video(*, text, out_path, voice_edge, speed, pitch, clip_paths, captio
         raise ValueError("The story is empty.")
 
     audio_path = os.path.join(workdir, f"{job_id}.mp3")
-    opened = []
+    cap_dir = os.path.join(workdir, f"{job_id}_caps")
+    log_path = os.path.join(workdir, f"{job_id}_ffmpeg.log")
+    bg_files = []   # normalized temp clips to delete afterwards
     try:
         progress(5, "Synthesizing voiceover")
         words = synthesize(text, voice_edge, speed_to_rate(speed), pitch_to_hz(pitch), audio_path)
+        duration = probe_duration(audio_path)
+        if duration <= 0:
+            raise RuntimeError("The voice service returned no audio.")
+        truncated = duration > S.MAX_DURATION
+        if truncated:
+            duration = float(S.MAX_DURATION)
 
-        voice = AudioFileClip(audio_path)
-        opened.append(voice)
-        duration = voice.duration
-        truncated = False
-        if duration > S.MAX_DURATION:
-            duration, truncated = S.MAX_DURATION, True
-            voice = voice.subclipped(0, duration)
+        progress(15, "Preparing footage")
+        segments = _plan_segments(clip_paths, duration)
+        bg_list = _write_background_list(segments, duration, workdir, job_id, bg_files, progress)
 
-        progress(20, "Preparing footage")
-        bg, sources = build_background(clip_paths, duration, W, H)
-        opened.extend(sources)
+        progress(40, "Setting captions")
+        os.makedirs(cap_dir, exist_ok=True)
+        list_path = _write_caption_sequence(build_chunks(text, words, duration), duration,
+                                            caption_style, cap_dir)
 
-        progress(35, "Setting captions")
-        chunks = [c for c in build_chunks(text, words, duration + 0.0) if c[0] < duration]
-        fade = 0.08
-        caption_clips = []
-        for start, end, chunk_text in chunks:
-            end = min(end, duration)
-            frame = render_caption(chunk_text, caption_style)
-            clip = ImageClip(frame, transparent=True).with_start(start).with_duration(end - start)
-            if end - start > 4 * fade:
-                clip = clip.with_effects([vfx.CrossFadeIn(fade)])
-            caption_clips.append(clip)
-
-        final = CompositeVideoClip([bg] + caption_clips, size=(W, H)).with_duration(duration)
-
-        tracks = [voice]
+        # ---- inputs (footage and captions are each ONE sequential input: low memory)
+        cmd = [FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-nostdin"]
+        cmd += ["-threads", "1", "-an", "-f", "concat", "-safe", "0", "-i", bg_list]
+        cap_idx = 1
+        cmd += ["-threads", "1", "-f", "concat", "-safe", "0", "-i", list_path]
+        voice_idx = 2
+        cmd += ["-i", audio_path]
+        music_idx = None
         if music_path and os.path.exists(music_path):
-            music = AudioFileClip(music_path)
-            opened.append(music)
-            music = music.with_effects([afx.AudioLoop(duration=duration)]).with_volume_scaled(0.12)
-            tracks.append(music)
-        final = final.with_audio(CompositeAudioClip(tracks).with_duration(duration))
+            music_idx = 3
+            cmd += ["-stream_loop", "-1", "-i", music_path]
+
+        # ---- filter graph
+        f = [f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"
+             f"setsar=1,fps={FPS},format=yuv420p[bg]",
+             f"[{cap_idx}:v]fps={FPS},format=rgba[caps]",
+             "[bg][caps]overlay=0:0:format=auto,format=yuv420p[vout]"]
+        if music_idx is not None:
+            f.append(f"[{music_idx}:a]volume=0.12[mus]")
+            f.append(f"[{voice_idx}:a][mus]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[aout]")
+        else:
+            f.append(f"[{voice_idx}:a]anull[aout]")
+
+        cmd += ["-filter_complex", ";".join(f), "-map", "[vout]", "-map", "[aout]",
+                "-t", f"{duration:.3f}", "-r", str(FPS),
+                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "28", "-pix_fmt", "yuv420p",
+                # low-memory encoder settings (no lookahead / B-frames, single thread)
+                "-x264-params", "rc-lookahead=0:sync-lookahead=0:bframes=0:threads=1",
+                "-threads", "1", "-filter_threads", "1", "-filter_complex_threads", "1",
+                "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart",
+                "-progress", "pipe:1", "-nostats", out_path]
 
         progress(45, "Rendering video")
-        final.write_videofile(out_path, fps=FPS, codec="libx264", audio_codec="aac",
-                              bitrate="6000k", audio_bitrate="192k", preset="veryfast",
-                              threads=4, logger=_Progress(progress, 45, 98),
-                              ffmpeg_params=["-pix_fmt", "yuv420p", "-movflags", "+faststart"])
-        final.close()
+        with open(log_path, "w") as log:
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=log, text=True)
+            for line in proc.stdout:
+                if line.startswith("out_time_us="):
+                    try:
+                        done = int(line.split("=")[1]) / 1e6
+                    except ValueError:
+                        continue
+                    progress(45 + 53 * min(done / duration, 1.0), "Rendering video")
+            code = proc.wait()
+        if code != 0:
+            with open(log_path) as log:
+                tail = "".join(log.readlines()[-8:]).strip()
+            raise RuntimeError(f"Video encoding failed: {tail or 'ffmpeg exited with ' + str(code)}")
         return duration, truncated
     finally:
-        for c in opened:
+        for p in (audio_path, log_path, os.path.join(workdir, f"{job_id}_bg.txt"), *bg_files):
+            if os.path.exists(p):
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
+        if os.path.isdir(cap_dir):
+            for fn in os.listdir(cap_dir):
+                try:
+                    os.remove(os.path.join(cap_dir, fn))
+                except OSError:
+                    pass
             try:
-                c.close()
-            except Exception:
-                pass
-        if os.path.exists(audio_path):
-            try:
-                os.remove(audio_path)
+                os.rmdir(cap_dir)
             except OSError:
                 pass
